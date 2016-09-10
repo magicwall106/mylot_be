@@ -1,0 +1,40 @@
+extends ../layout
+
+block content
+  .page-header
+    h3 Add new Result
+  form.form-horizontal(action='/result', id='add-result-form', method='POST')
+    input(type='hidden', name='_csrf', value=_csrf)
+    .form-group
+      label.col-sm-3.control-label(for='code') Code
+      .col-sm-7
+        input.form-control(name='code', id='code', placeholder='Result Code', autofocus, required)
+    .form-group
+      label.col-sm-3.control-label(for='resultDate') Result Date
+      .col-sm-7(id='resultDate')
+        input.form-control(name='resultDate', required)
+    .form-group
+      label.col-sm-3.control-label(for='nums') Numbers
+      .col-sm-7
+        input.col-sm-2(type='number', name='num1', id='num1', required)
+        input.col-sm-2(type='number', name='num2', id='num2', required)
+        input.col-sm-2(type='number', name='num3', id='num3', required)
+        input.col-sm-2(type='number', name='num4', id='num4', required)
+        input.col-sm-2(type='number', name='num5', id='num5', required)
+        input.col-sm-2(type='number', name='num6', id='num6', required)
+    .form-group
+      label.col-sm-3.control-label(for='nums') Awards
+      .col-sm-7
+        input.col-sm-2(type='number', name='award1', id='award1', required)
+        input.col-sm-2(type='number', name='award2', id='award2', required)
+        input.col-sm-2(type='number', name='award3', id='award3', required)
+        input.col-sm-2(type='number', name='award4', id='award4', required)
+    .form-group
+      .col-sm-offset-3.col-sm-7
+        button.btn.btn-success(type='submit')
+          i.fa.fa-user-plus
+          | Signup
+  script.
+    $(document).ready(function(){
+        $("#resultDate").datepicker();
+    });

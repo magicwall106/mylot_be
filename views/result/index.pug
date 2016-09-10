@@ -1,0 +1,37 @@
+extends ../layout
+
+block content
+  h2 Results Viet Lottery
+  hr
+
+  .row
+    p #{listResult}
+    table.table
+      thead
+        tr
+          th Firstname
+          th Lastname
+          th Email
+      tbody
+        each val in listResult
+          tr
+            td= val.code
+          tr
+            td John
+            td Doe
+            td john@example.com
+          tr
+            td Mary
+            td Moe
+            td mary@example.com
+          tr
+            td July
+            td Dooley
+            td july@example.com
+        else
+          tr There no values
+    a(href='/result/add', style='color: #fff')
+      .panel.panel-default(style='background-color: #3b5998')
+        .panel-body
+          |  Add Result
+  
