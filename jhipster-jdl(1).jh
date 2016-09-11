@@ -1,0 +1,103 @@
+entity Result_Vietlott {
+	id String,
+	code String,
+	resultDate ZoneDateTime,
+	num1 Integer,
+	num2 Integer,
+	num3 Integer,
+	num4 Integer,
+	num5 Integer,
+	num6 Integer,
+	award1 Integer,
+	award2 Integer,
+	award3 Integer,
+	award4 Integer,
+	createdAt ZoneDateTime,
+	updatedAt ZoneDateTime
+}
+
+entity Recommendation {
+	id String,
+	condition Condition,
+	num1 Integer,
+	num2 Integer,
+	num3 Integer,
+	num4 Integer,
+	num5 Integer,
+	num6 Integer,
+	createdAt ZoneDateTime,
+	updatedAt ZoneDateTime
+}
+
+entity Order {
+	id String,
+	createdAt ZoneDateTime,
+	updatedAt ZoneDateTime
+}
+
+entity Lottery {
+	id String,
+	status LotteryStatus,
+	num1 Integer,
+	num2 Integer,
+	num3 Integer,
+	num4 Integer,
+	num5 Integer,
+	num6 Integer,
+	createdAt ZoneDateTime,
+	updatedAt ZoneDateTime
+}
+
+enum Condition {
+    Emotion, Highest Rate, Lowest Rate, Most Popular, Least Popular 
+}
+
+enum LotteryStatus {
+	Try, Orderred, Paid, Transfering, Transferred, Hold
+}
+
+relationship ManyToMany {
+	Order{lottery(id)} to Lottery{order}
+}
+
+relationship OneToOne {
+	Country{region} to Region
+}
+
+relationship OneToOne {
+	Location{country} to Country
+}
+
+relationship OneToOne {
+	Department{location} to Location
+}
+
+
+
+// defining multiple OneToMany relationships with comments
+relationship OneToMany {
+	Order{job} to Job,
+	Department{employee} to Employee
+}
+
+relationship ManyToOne {
+	Employee{manager} to Employee
+}
+
+// defining multiple oneToOne relationships
+relationship OneToOne {
+	JobHistory{job} to Job,
+	JobHistory{department} to Department,
+	JobHistory{employee} to Employee
+}
+
+// Set pagination options
+paginate JobHistory, Employee with infinite-scroll
+paginate Job with pagination
+
+dto * with mapstruct
+
+// Set service options to all except few
+service all with serviceImpl except Employee, Job
+// Set an angular suffix
+angularSuffix * with mySuffix
