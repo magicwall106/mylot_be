@@ -33,6 +33,7 @@ const userController = require('./controllers/user');
 const apiController = require('./controllers/api');
 const contactController = require('./controllers/contact');
 const resultController = require('./controllers/result');
+const recommendationController = require('./controllers/recommendation');
 
 /**
  * API keys and Passport configuration.
@@ -131,14 +132,24 @@ app.post('/account/delete', passportConfig.isAuthenticated, userController.postD
 app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userController.getOauthUnlink);
 app.get('/result', passportConfig.isAuthenticated, resultController.getResult);
 app.get('/result/add', passportConfig.isAuthenticated, resultController.getAddResult);
+app.get('/recommendation', passportConfig.isAuthenticated, recommendationController.getRecommendation);
+app.get('/recommendation/add', passportConfig.isAuthenticated, recommendationController.getAddRecommendation);
 
 /**
  * API result.
  */
 app.get('/api/result', /*passportConfig.isAuthenticated, */resultController.getApiResult);
-app.put('/api/result', /*passportConfig.isAuthenticated, */resultController.putResult);
-app.post('/api/result', /*passportConfig.isAuthenticated, */resultController.postResult);
-app.delete('/api/result/:id', /*passportConfig.isAuthenticated, */resultController.deleteResult);
+app.put('/api/result', /*passportConfig.isAuthenticated, */resultController.putApiResult);
+app.post('/api/result', /*passportConfig.isAuthenticated, */resultController.postApiResult);
+app.delete('/api/result/:id', /*passportConfig.isAuthenticated, */resultController.deleteApiResult);
+
+/**
+ * API recommendation.
+ */
+app.get('/api/recommendation', /*passportConfig.isAuthenticated, */recommendationController.getApiRecommendation);
+app.put('/api/recommendation', /*passportConfig.isAuthenticated, */recommendationController.putApiRecommendation);
+app.post('/api/recommendation', /*passportConfig.isAuthenticated, */recommendationController.postApiRecommendation);
+app.delete('/api/recommendation/:id', /*passportConfig.isAuthenticated, */recommendationController.deleteApiRecommendation);
 
 /**
  * API examples routes.

@@ -4,73 +4,111 @@ const Recommendation = require('../models/Recommendation');
 
 /**
  * GET /recommendation
- * Result Index Page.
+ * Recommendation Index Page.
  */
-exports.getResult = (req, res) => {
-  Result.find({},function(err,data){
+exports.getRecommendation = (req, res) => {
+  Recommendation.find({},function(err,data){
       if (err) {
         res.render('error', {
             status: 500
         });
       } else {
-        res.render('result/index', {
-          title: 'Result',
-          listResult: data
+        res.render('recommendation/index', {
+          title: 'Recommendation',
+          listRecommendation: data
         });
       }
   });
 };
 
 /**
- * POST /results
- * Add single||multiple results.
+ * GET /recommendation/add
+ * Recommendation Add recommendation Page.
+ */
+exports.getAddRecommendation = (req, res) => {
+  res.render('recommendation/add', {
+    title: 'Add New Recommendation'
+  });
+};
+
+
+/**
+ * GET /api/recommendation
+ * Recommendation Json: Get all recommendations
+ */
+exports.getApiRecommendation = (req, res) => {
+  Recommendation.find({},function(err,data){
+      if (err) {
+        res.render('error', {
+            status: 500
+        });
+      } else {
+        res.jsonp(data);
+      }
+  });
+};
+
+/**
+ * POST /recommendation
+ * Add single||multiple recommendation.
  */
 
-exports.postResult = (req, res, next) => {
-  req.assert('code', 'Code is required').notEmpty();
-  req.assert('resultDate', 'Date is invalid').notEmpty().isDate();
-  req.assert('num1','Number is invalid').notEmpty().isInt();
-  req.assert('num2','Number is invalid').notEmpty().isInt();
-  req.assert('num3','Number is invalid').notEmpty().isInt();
-  req.assert('num4','Number is invalid').notEmpty().isInt();
-  req.assert('num5','Number is invalid').notEmpty().isInt();
-  req.assert('num6','Number is invalid').notEmpty().isInt();
-  //req.assert('award1','Number is invalid').notEmpty().isInt();
-  //req.assert('award2','Number is invalid').notEmpty().isInt();
-  //req.assert('award3','Number is invalid').notEmpty().isInt();
-  //req.assert('award4','Number is invalid').notEmpty().isInt();
-
+exports.postApiRecommendation = (req, res, next) => {
+  req.assert('user', 'User is required').notEmpty();
+  req.assert('condition', 'Condition is required').notEmpty();
+  req.assert('num1', 'Number 1 is invalid').notEmpty().isInt();
+  req.assert('rate1', 'Rating of Number 1 is invalid').isInt();
+  req.assert('num2', 'Number 2 is invalid').notEmpty().isInt();
+  req.assert('rate2', 'Rating of Number 2 is invalid').isInt();
+  req.assert('num3', 'Number 3 is invalid').notEmpty().isInt();
+  req.assert('rate3', 'Rating of Number 3 is invalid').isInt();
+  req.assert('num4', 'Number 4 is invalid').notEmpty().isInt();
+  req.assert('rate4', 'Rating of Number 4 is invalid').isInt();
+  req.assert('num5', 'Number 5 is invalid').notEmpty().isInt();
+  req.assert('rate5', 'Rating of Number 5 is invalid').isInt();
+  req.assert('num6', 'Number 6 is invalid').notEmpty().isInt();
+  req.assert('rate6', 'Rating of Number 6 is invalid').isInt();
   const errors = req.validationErrors();
   if (errors) {
     req.flash('errors', errors);
-    return res.redirect('/result/add');
+    return res.redirect('/recommendation/add');
   }
 
   if(req.user){
-    const result = new Result({
-      code: req.body.code,
-      resultDate: req.body.resultDate,
+    const recommendation = new Recommendation({
+      user: req.body.user,
+      condition: req.body.condition,
       nums: {
-        num1: req.body.num1,
-        num2: req.body.num2,
-        num3: req.body.num3,
-        num4: req.body.num4,
-        num5: req.body.num5,
-        num6: req.body.num6,
-      },
-      awards: {
-        award1: req.body.award1,
-        award2: req.body.award2,
-        award3: req.body.award3,
-        award4: req.body.award4
+        num1: {
+          value: req.body.num1,
+          rate: req.body.rate1
+        },
+        num2: {
+          value: req.body.num2,
+          rate: req.body.rate2
+        },
+        num3: {
+          value: req.body.num3,
+          rate: req.body.rate3
+        },
+        num4: {
+          value: req.body.num4,
+          rate: req.body.rate4
+        },
+        num5: {
+          value: req.body.num5,
+          rate: req.body.rate5
+        },
+        num6: {
+          value: req.body.num6,
+          rate: req.body.rate6
+        }
       }
     });
-    //res.jsonp(result);
-    result.save((err) => {
+    recommendation.save((err) => {
       if (err) { return next(err); }
       res.redirect('/');
     });
-
   } else {
     res.render('account/login', {
       title: 'Login',
@@ -80,27 +118,95 @@ exports.postResult = (req, res, next) => {
 };
 
 /**
- * GET /results
- * Result Index Page.
+ * PUT /recommendation
+ * Update Recommendation.
  */
-exports.getAddResult = (req, res) => {
-  res.render('result/add', {
-    title: 'Add New Result'
-  });
+exports.putApiRecommendation = (req, res, next) => {
+  req.assert('condition', 'Condition is required').notEmpty();
+  req.assert('num1', 'Number 1 is invalid').notEmpty().isInt();
+  req.assert('rate1', 'Rating of Number 1 is invalid').isInt();
+  req.assert('num2', 'Number 2 is invalid').notEmpty().isInt();
+  req.assert('rate2', 'Rating of Number 2 is invalid').isInt();
+  req.assert('num3', 'Number 3 is invalid').notEmpty().isInt();
+  req.assert('rate3', 'Rating of Number 3 is invalid').isInt();
+  req.assert('num4', 'Number 4 is invalid').notEmpty().isInt();
+  req.assert('rate4', 'Rating of Number 4 is invalid').isInt();
+  req.assert('num5', 'Number 5 is invalid').notEmpty().isInt();
+  req.assert('rate5', 'Rating of Number 5 is invalid').isInt();
+  req.assert('num6', 'Number 6 is invalid').notEmpty().isInt();
+  req.assert('rate6', 'Rating of Number 6 is invalid').isInt();
+
+  const errors = req.validationErrors();
+  if (errors) {
+    req.flash('errors', errors);
+    return res.send(JSON.stringify(errors));
+  }
+  const id = req.body.id;
+  if(req.user && id){
+    Recommendation.update({_id: id}, {$set: {
+      condition: req.body.condition,
+      nums: {
+        num1: {
+          value: req.body.num1,
+          rate: req.body.rate1
+        },
+        num2: {
+          value: req.body.num2,
+          rate: req.body.rate2
+        },
+        num3: {
+          value: req.body.num3,
+          rate: req.body.rate3
+        },
+        num4: {
+          value: req.body.num4,
+          rate: req.body.rate4
+        },
+        num5: {
+          value: req.body.num5,
+          rate: req.body.rate5
+        },
+        num6: {
+          value: req.body.num6,
+          rate: req.body.rate6
+        }
+      }
+    }}, function(err) {
+        if (!err) {
+          res.send('notification!');
+        }
+        else {
+          res.send(err);
+        }
+    });
+  } else {
+    res.render('account/login', {
+      title: 'Login',
+      message: "Login first! You don't have permission to access this URL!"
+    });
+  }
 };
 
 /**
- * GET /api/results
- * Result Json: Get all results
+ * DELETE /recommendation
+ * delete recommendation.
  */
-exports.getApiResult = (req, res) => {
-  Result.find({},function(err,data){
-      if (err) {
-        res.render('error', {
-            status: 500
-        });
-      } else {
-        res.jsonp(data);
+exports.deleteApiRecommendation = (req, res, next) => {
+  const id = req.params.id;
+  if(req.user && id){
+    Recommendation.remove({ _id: id }, function(err) {
+      if (!err) {
+        res.send('notification!');
       }
-  });
+      else {
+        res.send(err);
+      }
+    });
+    //res.send("asdasdas");
+  } else {
+    res.render('account/login', {
+      title: 'Login',
+      message: "Login first! You don't have permission to access this URL!"
+    });
+  }
 };

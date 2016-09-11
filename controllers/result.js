@@ -22,11 +22,21 @@ exports.getResult = (req, res) => {
 };
 
 /**
+ * GET /result
+ * Result Index Page.
+ */
+exports.getAddResult = (req, res) => {
+  res.render('result/add', {
+    title: 'Add New Result'
+  });
+};
+
+/**
  * POST /result
  * Add single||multiple results.
  */
 
-exports.postResult = (req, res, next) => {
+exports.postApiResult = (req, res, next) => {
   req.assert('code', 'Code is required').notEmpty();
   req.assert('resultDate', 'Result Date is invalid').notEmpty().isDate();
   req.assert('num1','Number 1 is invalid').notEmpty().isInt();
@@ -78,7 +88,7 @@ exports.postResult = (req, res, next) => {
  * PUT /result
  * Update result.
  */
-exports.putResult = (req, res, next) => {
+exports.putApiResult = (req, res, next) => {
   req.assert('id', 'Did not found ID result').notEmpty();
   req.assert('resultDate', 'Result Date is invalid').isDate();
   req.assert('num1','Number 1 is invalid').isInt();
@@ -135,7 +145,7 @@ exports.putResult = (req, res, next) => {
  * DELETE /result
  * delete result.
  */
-exports.deleteResult = (req, res, next) => {
+exports.deleteApiResult = (req, res, next) => {
   const id = req.params.id;
   if(req.user && id){
     Result.remove({ _id: id }, function(err) {
@@ -153,16 +163,6 @@ exports.deleteResult = (req, res, next) => {
       message: "Login first! You don't have permission to access this URL!"
     });
   }
-};
-
-/**
- * GET /result
- * Result Index Page.
- */
-exports.getAddResult = (req, res) => {
-  res.render('result/add', {
-    title: 'Add New Result'
-  });
 };
 
 /**
