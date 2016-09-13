@@ -1,0 +1,37 @@
+extends ../layout
+
+block content
+  h2 Recommendation
+  hr
+
+  .row
+    p #{listRecommendation}
+    table.table
+      thead
+        tr
+          th Firstname
+          th Lastname
+          th Email
+      tbody
+        each val in listRecommendation
+          tr
+            td= val.id
+          tr
+            td John
+            td Doe
+            td john@example.com
+          tr
+            td Mary
+            td Moe
+            td mary@example.com
+          tr
+            td July
+            td Dooley
+            td july@example.com
+        else
+          tr There no values
+    a(href='/recommendation/add', style='color: #fff')
+      .panel.panel-default(style='background-color: #3b5998')
+        .panel-body
+          |  Add Recommendation
+  

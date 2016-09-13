@@ -1,0 +1,50 @@
+extends ../layout
+
+block content
+  .page-header
+    h3 Add New Recommendation
+  form.form-horizontal(action='/api/recommendation', id='add-recomendation-form', method='POST')
+    input(type='hidden', name='_csrf', value=_csrf)
+    .form-group
+      label.col-sm-3.control-label(for='user') User
+      .col-sm-7
+        input.form-control(name='user', id='user', required)
+    .form-group
+      label.col-sm-3.control-label(for='condition') Condition
+      .col-sm-7
+        input.form-control(name='condition', id='condition', placeholder='Emotion', autofocus, required)
+    .form-group
+      label.col-sm-3.control-label(for='number1') Number 1
+      .col-sm-7
+        input.col-sm-2.form-control(name='num1', required)
+        input.col-sm-2.form-control(name='rate1', required)
+    .form-group
+      label.col-sm-3.control-label(for='number2') Number 2
+      .col-sm-7
+        input.col-sm-2.form-control(name='num2', required)
+        input.col-sm-2.form-control(name='rate2', required)
+    .form-group
+      label.col-sm-3.control-label(for='number3') Number 3
+      .col-sm-7
+        input.col-sm-2.form-control(name='num3', required)
+        input.col-sm-2.form-control(name='rate3', required)
+    .form-group
+      label.col-sm-3.control-label(for='number4') Number 4
+      .col-sm-7
+        input.col-sm-2.form-control(name='num4', required)
+        input.col-sm-2.form-control(name='rate4', required)
+    .form-group
+      label.col-sm-3.control-label(for='number5') Number 5
+      .col-sm-7
+        input.col-sm-2.form-control(name='num5', required)
+        input.col-sm-2.form-control(name='rate5', required)
+    .form-group
+      label.col-sm-3.control-label(for='number6') Number 6
+      .col-sm-7
+        input.col-sm-2.form-control(name='num6', required)
+        input.col-sm-2.form-control(name='rate6', required)
+    .form-group
+      .col-sm-offset-3.col-sm-7
+        button.btn.btn-success(type='submit')
+          i.fa.fa-user-plus
+          | Signup
