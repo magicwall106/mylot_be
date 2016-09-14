@@ -1,9 +1,9 @@
 const nodemailer = require('nodemailer');
 const transporter = nodemailer.createTransport({
-  service: 'SendGrid',
+  service: 'gmail',
   auth: {
-    user: process.env.SENDGRID_USER,
-    pass: process.env.SENDGRID_PASSWORD
+    user: process.env.GMAIL_USERID,
+    pass: process.env.GMAIL_PASSWORD
   }
 });
 
