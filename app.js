@@ -134,8 +134,8 @@ app.get('/result', passportConfig.isAuthenticated, resultController.getResult);
 app.get('/result/add', passportConfig.isAuthenticated, resultController.getAddResult);
 app.get('/recommendation', passportConfig.isAuthenticated, recommendationController.getRecommendation);
 app.get('/recommendation/add', passportConfig.isAuthenticated, recommendationController.getAddRecommendation);
-app.get('/lottery', passportConfig.isAuthenticated, recommendationController.getRecommendation);
-app.get('/lottery/add', passportConfig.isAuthenticated, recommendationController.getAddRecommendation);
+app.get('/lottery', passportConfig.isAuthenticated, lotteryController.getRecommendation);
+app.get('/lottery/add', passportConfig.isAuthenticated, lotteryController.getAddRecommendation);
 
 
 /**
