@@ -21,6 +21,8 @@
           a(href='/result') Result
         li(class=(title == 'Recommendation') ? 'active' : undefined)
           a(href='/recommendation') Recommendation
+        li(class=(title == 'Lottery') ? 'active' : undefined)
+          a(href='/lottery') Lottery
       ul.nav.navbar-nav.navbar-right
         if !user
           li(class=(title == 'Login') ? 'active' : undefined)

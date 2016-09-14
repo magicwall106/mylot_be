@@ -1,5 +1,3 @@
-const async = require('async');
-const nodemailer = require('nodemailer');
 const Result = require('../models/Result');
 
 /**

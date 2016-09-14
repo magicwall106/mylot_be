@@ -1,41 +1,41 @@
-const Recommendation = require('../models/Recommendation');
+const Lottery = require('../models/Lottery');
 
 /**
- * GET /recommendation
- * Recommendation Index Page.
+ * GET /lottery
+ * Lottery Index Page.
  */
-exports.getRecommendation = (req, res) => {
-  Recommendation.find({},function(err,data){
+exports.getLottery = (req, res) => {
+  Lottery.find({},function(err,data){
       if (err) {
         res.render('error', {
             status: 500
         });
       } else {
-        res.render('recommendation/index', {
-          title: 'Recommendation',
-          listRecommendation: data
+        res.render('lottery/index', {
+          title: 'Lottery',
+          listLottery: data
         });
       }
   });
 };
 
 /**
- * GET /recommendation/add
- * Recommendation Add recommendation Page.
+ * GET /lottery/add
+ * Lottery Add lottery Page.
  */
-exports.getAddRecommendation = (req, res) => {
-  res.render('recommendation/add', {
-    title: 'Add New Recommendation'
+exports.getAddLottery = (req, res) => {
+  res.render('lottery/add', {
+    title: 'Add New Lottery'
   });
 };
 
 
 /**
- * GET /api/recommendation
- * Recommendation Json: Get all recommendations
+ * GET /api/lottery
+ * Lottery Json: Get all lotteries
  */
-exports.getApiRecommendation = (req, res) => {
-  Recommendation.find({},function(err,data){
+exports.getApiLottery = (req, res) => {
+  Lottery.find({},function(err,data){
       if (err) {
         res.render('error', {
             status: 500
@@ -47,11 +47,11 @@ exports.getApiRecommendation = (req, res) => {
 };
 
 /**
- * POST /recommendation
- * Add single||multiple recommendation.
+ * POST /lottery
+ * Add single||multiple lottery.
  */
 
-exports.postApiRecommendation = (req, res, next) => {
+exports.postApiLottery = (req, res, next) => {
   req.assert('user', 'User is required').notEmpty();
   req.assert('result', 'Result is required').notEmpty();
   req.assert('condition', 'Condition is required').notEmpty();
@@ -70,11 +70,11 @@ exports.postApiRecommendation = (req, res, next) => {
   const errors = req.validationErrors();
   if (errors) {
     req.flash('errors', errors);
-    return res.redirect('/recommendation/add');
+    return res.redirect('/lottery/add');
   }
 
   if(req.user){
-    const recommendation = new Recommendation({
+    const lottery = new Lottery({
       user: req.body.user,
       result: req.body.result,
       condition: req.body.condition,
@@ -105,7 +105,7 @@ exports.postApiRecommendation = (req, res, next) => {
         }
       }
     });
-    recommendation.save((err) => {
+    lottery.save((err) => {
       if (err) { return next(err); }
       res.redirect('/');
     });
@@ -118,10 +118,10 @@ exports.postApiRecommendation = (req, res, next) => {
 };
 
 /**
- * PUT /recommendation
- * Update Recommendation.
+ * PUT /lottery
+ * Update Lottery.
  */
-exports.putApiRecommendation = (req, res, next) => {
+exports.putApiLottery = (req, res, next) => {
   req.assert('condition', 'Condition is required').notEmpty();
   req.assert('num1', 'Number 1 is invalid').notEmpty().isInt();
   req.assert('rate1', 'Rating of Number 1 is invalid').isInt();
@@ -143,7 +143,7 @@ exports.putApiRecommendation = (req, res, next) => {
   }
   const id = req.body.id;
   if(req.user && id){
-    Recommendation.update({_id: id}, {$set: {
+    Lottery.update({_id: id}, {$set: {
       condition: req.body.condition,
       result: req.body.result,
       nums: {
@@ -189,13 +189,13 @@ exports.putApiRecommendation = (req, res, next) => {
 };
 
 /**
- * DELETE /recommendation
- * delete recommendation.
+ * DELETE /lottery
+ * delete lottery.
  */
-exports.deleteApiRecommendation = (req, res, next) => {
+exports.deleteApiLottery = (req, res, next) => {
   const id = req.params.id;
   if(req.user && id){
-    Recommendation.remove({ _id: id }, function(err) {
+    Lottery.remove({ _id: id }, function(err) {
       if (!err) {
         res.send('notification!');
       }

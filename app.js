@@ -34,7 +34,7 @@ const apiController = require('./controllers/api');
 const contactController = require('./controllers/contact');
 const resultController = require('./controllers/result');
 const recommendationController = require('./controllers/recommendation');
-
+const lotteryController = require('./controllers/lottery');
 /**
  * API keys and Passport configuration.
  */
@@ -134,6 +134,9 @@ app.get('/result', passportConfig.isAuthenticated, resultController.getResult);
 app.get('/result/add', passportConfig.isAuthenticated, resultController.getAddResult);
 app.get('/recommendation', passportConfig.isAuthenticated, recommendationController.getRecommendation);
 app.get('/recommendation/add', passportConfig.isAuthenticated, recommendationController.getAddRecommendation);
+app.get('/lottery', passportConfig.isAuthenticated, recommendationController.getRecommendation);
+app.get('/lottery/add', passportConfig.isAuthenticated, recommendationController.getAddRecommendation);
+
 
 /**
  * API result.
@@ -151,6 +154,13 @@ app.put('/api/recommendation', /*passportConfig.isAuthenticated, */recommendatio
 app.post('/api/recommendation', /*passportConfig.isAuthenticated, */recommendationController.postApiRecommendation);
 app.delete('/api/recommendation/:id', /*passportConfig.isAuthenticated, */recommendationController.deleteApiRecommendation);
 
+/**
+ * API lottery.
+ */
+app.get('/api/lottery', /*passportConfig.isAuthenticated, */lotteryController.getApiLottery);
+app.put('/api/lottery', /*passportConfig.isAuthenticated, */lotteryController.putApiLottery);
+app.post('/api/lottery', /*passportConfig.isAuthenticated, */lotteryController.postApiLottery);
+app.delete('/api/lottery/:id', /*passportConfig.isAuthenticated, */lotteryController.deleteApiLottery);
 /**
  * API examples routes.
  */

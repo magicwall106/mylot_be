@@ -1,0 +1,31 @@
+extends ../layout
+
+block content
+  h2 Lottery
+  hr
+
+  .row
+    p #{listLottery}
+    table.table
+      thead
+        tr
+          th Id
+          th User
+          th Result
+          th Condition
+          th Award
+      tbody
+        each val in listLottery
+          tr
+            td= val.id
+            td= val.user
+            td= val.result
+            td= val.condition
+            td= val.award
+        else
+          tr There no values
+    a(href='/lottery/add', style='color: #fff')
+      .panel.panel-default(style='background-color: #3b5998')
+        .panel-body
+          |  Add Lottery
+  
