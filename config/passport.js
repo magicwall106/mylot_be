@@ -66,6 +66,7 @@ passport.use(new FacebookStrategy({
       } else {
         User.findById(req.user.id, (err, user) => {
           user.facebook = profile.id;
+          user.phone = '';
           user.tokens.push({ kind: 'facebook', accessToken });
           user.profile.name = user.profile.name || profile.name.givenName + ' ' + profile.name.familyName;
           user.profile.gender = user.profile.gender || profile._json.gender;
@@ -90,6 +91,7 @@ passport.use(new FacebookStrategy({
           const user = new User();
           user.email = profile._json.email;
           user.facebook = profile.id;
+          user.phone = '';
           user.tokens.push({ kind: 'facebook', accessToken });
           user.profile.name = profile.name.givenName + ' ' + profile.name.familyName;
           user.profile.gender = profile._json.gender;
@@ -121,6 +123,7 @@ passport.use(new GoogleStrategy({
       } else {
         User.findById(req.user.id, (err, user) => {
           user.google = profile.id;
+          user.phone = '';
           user.tokens.push({ kind: 'google', accessToken });
           user.profile.name = user.profile.name || profile.displayName;
           user.profile.gender = user.profile.gender || profile._json.gender;
@@ -145,6 +148,7 @@ passport.use(new GoogleStrategy({
           const user = new User();
           user.email = profile.emails[0].value;
           user.google = profile.id;
+          user.phone = '';
           user.tokens.push({ kind: 'google', accessToken });
           user.profile.name = profile.displayName;
           user.profile.gender = profile._json.gender;
