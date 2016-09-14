@@ -5,7 +5,7 @@ const Recommendation = require('../models/Recommendation');
  * Recommendation Index Page.
  */
 exports.getRecommendation = (req, res) => {
-  Recommendation.find({},function(err,data){
+  Recommendation.find({'user': req.user.id},function(err,data){
       if (err) {
         res.render('error', {
             status: 500
@@ -52,7 +52,7 @@ exports.getApiRecommendation = (req, res) => {
  */
 
 exports.postApiRecommendation = (req, res, next) => {
-  req.assert('user', 'User is required').notEmpty();
+  //req.assert('user', 'User is required').notEmpty();
   req.assert('result', 'Result is required').notEmpty();
   req.assert('condition', 'Condition is required').notEmpty();
   req.assert('num1', 'Number 1 is invalid').notEmpty().isInt();
@@ -75,7 +75,7 @@ exports.postApiRecommendation = (req, res, next) => {
 
   if(req.user){
     const recommendation = new Recommendation({
-      user: req.body.user,
+      user: req.user.id,
       result: req.body.result,
       condition: req.body.condition,
       nums: {

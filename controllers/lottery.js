@@ -5,7 +5,7 @@ const Lottery = require('../models/Lottery');
  * Lottery Index Page.
  */
 exports.getLottery = (req, res) => {
-  Lottery.find({},function(err,data){
+  Lottery.find({'user': req.user.id},function(err,data){
       if (err) {
         res.render('error', {
             status: 500
@@ -52,7 +52,7 @@ exports.getApiLottery = (req, res) => {
  */
 
 exports.postApiLottery = (req, res, next) => {
-  req.assert('user', 'User is required').notEmpty();
+  //req.assert('user', 'User is required').notEmpty();
   req.assert('result', 'Result is required').notEmpty();
   req.assert('condition', 'Condition is required').notEmpty();
   req.assert('num1', 'Number 1 is invalid').notEmpty().isInt();
@@ -75,7 +75,7 @@ exports.postApiLottery = (req, res, next) => {
 
   if(req.user){
     const lottery = new Lottery({
-      user: req.body.user,
+      user: req.user.id,
       result: req.body.result,
       condition: req.body.condition,
       nums: {
