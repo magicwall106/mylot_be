@@ -1,6 +1,5 @@
 const _ = require('lodash');
 const passport = require('passport');
-const request = require('request');
 const LocalStrategy = require('passport-local').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;

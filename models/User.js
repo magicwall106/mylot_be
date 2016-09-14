@@ -17,7 +17,8 @@ const userSchema = new mongoose.Schema({
   linkedin: String,
   steam: String,
   tokens: Array,
-
+  realAwards: [{type: mongoose.Schema.Types.ObjectId, ref:"Lottery"}],
+  tryAwards: [{type: mongoose.Schema.Types.ObjectId, ref:"Recommendation"}],
   profile: {
     name: String,
     gender: String,

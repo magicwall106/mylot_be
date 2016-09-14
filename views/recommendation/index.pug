@@ -9,25 +9,19 @@ block content
     table.table
       thead
         tr
-          th Firstname
-          th Lastname
-          th Email
+          th Id
+          th User
+          th Result
+          th Condition
+          th Award
       tbody
         each val in listRecommendation
           tr
             td= val.id
-          tr
-            td John
-            td Doe
-            td john@example.com
-          tr
-            td Mary
-            td Moe
-            td mary@example.com
-          tr
-            td July
-            td Dooley
-            td july@example.com
+            td= val.user
+            td= val.result
+            td= val.condition
+            td= val.award
         else
           tr There no values
     a(href='/recommendation/add', style='color: #fff')

@@ -10,6 +10,10 @@ block content
       .col-sm-7
         input.form-control(name='code', id='code', placeholder='Result Code', autofocus, required)
     .form-group
+      label.col-sm-3.control-label(for='budget') Budget
+      .col-sm-7
+        input.form-control(type='number' name='budget', id='budget', required, value='0')
+    .form-group
       label.col-sm-3.control-label(for='resultDate') Result Date
       .col-sm-7(id='resultDate')
         input.form-control(name='resultDate', required)
@@ -25,15 +29,15 @@ block content
     .form-group
       label.col-sm-3.control-label(for='nums') Awards
       .col-sm-7
-        input.col-sm-2(type='number', name='award1', id='award1', required)
-        input.col-sm-2(type='number', name='award2', id='award2', required)
-        input.col-sm-2(type='number', name='award3', id='award3', required)
-        input.col-sm-2(type='number', name='award4', id='award4', required)
+        input.col-sm-2(type='number', name='award1', id='award1', required, value='0')
+        input.col-sm-2(type='number', name='award2', id='award2', required, value='0')
+        input.col-sm-2(type='number', name='award3', id='award3', required, value='0')
+        input.col-sm-2(type='number', name='award4', id='award4', required, value='0')
     .form-group
       .col-sm-offset-3.col-sm-7
         button.btn.btn-success(type='submit')
           i.fa.fa-user-plus
-          | Signup
+          | Add
   script.
     $(document).ready(function(){
         $("#resultDate").datepicker();

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
-const recommendationSchema = new mongoose.Schema({
-  result: {
+const lotterySchema = new mongoose.Schema({
+	result: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Result'
   },
@@ -49,11 +49,14 @@ const recommendationSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-recommendationSchema.pre('save', function (next) {
-  console.log('INFO-RECOMMENDATION: Saving recommendation date: ');
+/**
+ * Password hash middleware.
+ */
+lotterySchema.pre('save', function (next) {
+  console.log('INFO-LOTTERY: Saving lottery date: ');
   next();
 });
 
-const Recommendation = mongoose.model('Recommendation', recommendationSchema);
+const Lottery = mongoose.model('Lottery', lotterySchema);
 
-module.exports = Recommendation;
+module.exports =Lottery;

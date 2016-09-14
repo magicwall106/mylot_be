@@ -38,6 +38,7 @@ exports.getAddResult = (req, res) => {
 
 exports.postApiResult = (req, res, next) => {
   req.assert('code', 'Code is required').notEmpty();
+  req.assert('budget','Budget is invalid').notEmpty().isInt();
   req.assert('resultDate', 'Result Date is invalid').notEmpty().isDate();
   req.assert('num1','Number 1 is invalid').notEmpty().isInt();
   req.assert('num2','Number 2 is invalid').notEmpty().isInt();
@@ -45,6 +46,10 @@ exports.postApiResult = (req, res, next) => {
   req.assert('num4','Number 4 is invalid').notEmpty().isInt();
   req.assert('num5','Number 5 is invalid').notEmpty().isInt();
   req.assert('num6','Number 6 is invalid').notEmpty().isInt();
+  req.assert('award1','Award 1 is invalid').isInt();
+  req.assert('award2','Award 2 is invalid').isInt();
+  req.assert('award3','Award 3 is invalid').isInt();
+  req.assert('award4','Award 4 is invalid').isInt();
   const errors = req.validationErrors();
   if (errors) {
     req.flash('errors', errors);
@@ -54,6 +59,7 @@ exports.postApiResult = (req, res, next) => {
   if(req.user){
     const result = new Result({
       code: req.body.code,
+      budget: req.body.budget,
       resultDate: req.body.resultDate,
       nums: {
         num1: req.body.num1,
@@ -90,6 +96,7 @@ exports.postApiResult = (req, res, next) => {
  */
 exports.putApiResult = (req, res, next) => {
   req.assert('id', 'Did not found ID result').notEmpty();
+  req.assert('budget','Budget is invalid').isInt();
   req.assert('resultDate', 'Result Date is invalid').isDate();
   req.assert('num1','Number 1 is invalid').isInt();
   req.assert('num2','Number 2 is invalid').isInt();
@@ -111,6 +118,7 @@ exports.putApiResult = (req, res, next) => {
   if(req.user && id){
     Result.update({_id: id}, {$set: {
       resultDate: req.body.resultDate,
+      budget: req.body.budget,
       nums: {
         num1: req.body.num1,
         num2: req.body.num2,

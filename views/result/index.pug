@@ -9,25 +9,15 @@ block content
     table.table
       thead
         tr
-          th Firstname
-          th Lastname
-          th Email
+          th Code
+          th Budget
+          th Result Date
       tbody
         each val in listResult
           tr
             td= val.code
-          tr
-            td John
-            td Doe
-            td john@example.com
-          tr
-            td Mary
-            td Moe
-            td mary@example.com
-          tr
-            td July
-            td Dooley
-            td july@example.com
+            td= val.budget
+            td= val.resultDate
         else
           tr There no values
     a(href='/result/add', style='color: #fff')

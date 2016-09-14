@@ -1,9 +1,8 @@
-const bcrypt = require('bcrypt-nodejs');
-const crypto = require('crypto');
 const mongoose = require('mongoose');
 
 const resultSchema = new mongoose.Schema({
 	code: { type: String, unique: true },
+  budget: Number,
 	resultDate: Date,
   nums: {
     num1: Number,

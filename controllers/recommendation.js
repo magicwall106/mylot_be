@@ -55,6 +55,7 @@ exports.getApiRecommendation = (req, res) => {
 
 exports.postApiRecommendation = (req, res, next) => {
   req.assert('user', 'User is required').notEmpty();
+  req.assert('result', 'Result is required').notEmpty();
   req.assert('condition', 'Condition is required').notEmpty();
   req.assert('num1', 'Number 1 is invalid').notEmpty().isInt();
   req.assert('rate1', 'Rating of Number 1 is invalid').isInt();
@@ -77,6 +78,7 @@ exports.postApiRecommendation = (req, res, next) => {
   if(req.user){
     const recommendation = new Recommendation({
       user: req.body.user,
+      result: req.body.result,
       condition: req.body.condition,
       nums: {
         num1: {
@@ -145,6 +147,7 @@ exports.putApiRecommendation = (req, res, next) => {
   if(req.user && id){
     Recommendation.update({_id: id}, {$set: {
       condition: req.body.condition,
+      result: req.body.result,
       nums: {
         num1: {
           value: req.body.num1,
