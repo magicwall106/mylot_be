@@ -5,17 +5,17 @@ const Result = require('../models/Result');
  * Result Index Page.
  */
 exports.getResult = (req, res) => {
-  Result.find({},function(err,data){
-      if (err) {
-        res.render('error', {
-            status: 500
-        });
-      } else {
-        res.render('result/index', {
-          title: 'Result',
-          listResult: data
-        });
-      }
+  Result.find({}, function (err, data) {
+    if (err) {
+      res.render('error', {
+        status: 500
+      });
+    } else {
+      res.render('result/index', {
+        title: 'Result',
+        listResult: data
+      });
+    }
   });
 };
 
@@ -36,25 +36,25 @@ exports.getAddResult = (req, res) => {
 
 exports.postApiResult = (req, res, next) => {
   req.assert('code', 'Code is required').notEmpty();
-  req.assert('budget','Budget is invalid').notEmpty().isInt();
+  req.assert('budget', 'Budget is invalid').notEmpty().isInt();
   req.assert('resultDate', 'Result Date is invalid').notEmpty().isDate();
-  req.assert('num1','Number 1 is invalid').notEmpty().isInt();
-  req.assert('num2','Number 2 is invalid').notEmpty().isInt();
-  req.assert('num3','Number 3 is invalid').notEmpty().isInt();
-  req.assert('num4','Number 4 is invalid').notEmpty().isInt();
-  req.assert('num5','Number 5 is invalid').notEmpty().isInt();
-  req.assert('num6','Number 6 is invalid').notEmpty().isInt();
-  req.assert('award1','Award 1 is invalid').isInt();
-  req.assert('award2','Award 2 is invalid').isInt();
-  req.assert('award3','Award 3 is invalid').isInt();
-  req.assert('award4','Award 4 is invalid').isInt();
+  req.assert('num1', 'Number 1 is invalid').notEmpty().isInt();
+  req.assert('num2', 'Number 2 is invalid').notEmpty().isInt();
+  req.assert('num3', 'Number 3 is invalid').notEmpty().isInt();
+  req.assert('num4', 'Number 4 is invalid').notEmpty().isInt();
+  req.assert('num5', 'Number 5 is invalid').notEmpty().isInt();
+  req.assert('num6', 'Number 6 is invalid').notEmpty().isInt();
+  req.assert('award1', 'Award 1 is invalid').isInt();
+  req.assert('award2', 'Award 2 is invalid').isInt();
+  req.assert('award3', 'Award 3 is invalid').isInt();
+  req.assert('award4', 'Award 4 is invalid').isInt();
   const errors = req.validationErrors();
   if (errors) {
     req.flash('errors', errors);
     return res.redirect('/result/add');
   }
 
-  if(req.user){
+  if (req.user) {
     const result = new Result({
       code: req.body.code,
       budget: req.body.budget,
@@ -94,18 +94,18 @@ exports.postApiResult = (req, res, next) => {
  */
 exports.putApiResult = (req, res, next) => {
   req.assert('id', 'Did not found ID result').notEmpty();
-  req.assert('budget','Budget is invalid').isInt();
+  req.assert('budget', 'Budget is invalid').isInt();
   req.assert('resultDate', 'Result Date is invalid').isDate();
-  req.assert('num1','Number 1 is invalid').isInt();
-  req.assert('num2','Number 2 is invalid').isInt();
-  req.assert('num3','Number 3 is invalid').isInt();
-  req.assert('num4','Number 4 is invalid').isInt();
-  req.assert('num5','Number 5 is invalid').isInt();
-  req.assert('num6','Number 6 is invalid').isInt();
-  req.assert('award1','Award 1 is invalid').isInt();
-  req.assert('award2','Award 2 is invalid').isInt();
-  req.assert('award3','Award 3 is invalid').isInt();
-  req.assert('award4','Award 4 is invalid').isInt();
+  req.assert('num1', 'Number 1 is invalid').isInt();
+  req.assert('num2', 'Number 2 is invalid').isInt();
+  req.assert('num3', 'Number 3 is invalid').isInt();
+  req.assert('num4', 'Number 4 is invalid').isInt();
+  req.assert('num5', 'Number 5 is invalid').isInt();
+  req.assert('num6', 'Number 6 is invalid').isInt();
+  req.assert('award1', 'Award 1 is invalid').isInt();
+  req.assert('award2', 'Award 2 is invalid').isInt();
+  req.assert('award3', 'Award 3 is invalid').isInt();
+  req.assert('award4', 'Award 4 is invalid').isInt();
 
   const errors = req.validationErrors();
   if (errors) {
@@ -113,31 +113,33 @@ exports.putApiResult = (req, res, next) => {
     return res.send(JSON.stringify(errors));
   }
   const id = req.body.id;
-  if(req.user && id){
-    Result.update({_id: id}, {$set: {
-      resultDate: req.body.resultDate,
-      budget: req.body.budget,
-      nums: {
-        num1: req.body.num1,
-        num2: req.body.num2,
-        num3: req.body.num3,
-        num4: req.body.num4,
-        num5: req.body.num5,
-        num6: req.body.num6,
-      },
-      awards: {
-        award1: req.body.award1,
-        award2: req.body.award2,
-        award3: req.body.award3,
-        award4: req.body.award4
+  if (req.user && id) {
+    Result.update({ _id: id }, {
+      $set: {
+        resultDate: req.body.resultDate,
+        budget: req.body.budget,
+        nums: {
+          num1: req.body.num1,
+          num2: req.body.num2,
+          num3: req.body.num3,
+          num4: req.body.num4,
+          num5: req.body.num5,
+          num6: req.body.num6,
+        },
+        awards: {
+          award1: req.body.award1,
+          award2: req.body.award2,
+          award3: req.body.award3,
+          award4: req.body.award4
+        }
       }
-    }}, function(err) {
-        if (!err) {
-          res.send('notification!');
-        }
-        else {
-          res.send(err);
-        }
+    }, function (err) {
+      if (!err) {
+        res.send('notification!');
+      }
+      else {
+        res.send(err);
+      }
     });
   } else {
     res.render('account/login', {
@@ -153,14 +155,14 @@ exports.putApiResult = (req, res, next) => {
  */
 exports.deleteApiResult = (req, res, next) => {
   const id = req.params.id;
-  if(req.user && id){
-    Result.remove({ _id: id }, function(err) {
-        if (!err) {
-                res.send('notification!');
-        }
-        else {
-                res.send(err);
-        }
+  if (req.user && id) {
+    Result.remove({ _id: id }, function (err) {
+      if (!err) {
+        res.send('notification!');
+      }
+      else {
+        res.send(err);
+      }
     });
     //res.send("asdasdas");
   } else {
@@ -176,13 +178,13 @@ exports.deleteApiResult = (req, res, next) => {
  * Result Json: Get all results
  */
 exports.getApiResult = (req, res) => {
-  Result.find({},function(err,data){
-      if (err) {
-        res.render('error', {
-            status: 500
-        });
-      } else {
-        res.jsonp(data);
-      }
+  Result.find({}, function (err, data) {
+    if (err) {
+      res.render('error', {
+        status: 500
+      });
+    } else {
+      res.jsonp(data);
+    }
   });
 };

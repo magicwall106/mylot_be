@@ -1,27 +1,27 @@
 const Lottery = require('../models/Lottery');
 
+/****************************WEBPAGE SESSION********************************/
 /**
- * GET /lottery
- * Lottery Index Page.
+ * GET /lottery by user | Lottery Index Page.
  */
 exports.getLottery = (req, res) => {
-  Lottery.find({'user': req.user.id},function(err,data){
-      if (err) {
-        res.render('error', {
-            status: 500
-        });
-      } else {
-        res.render('lottery/index', {
-          title: 'Lottery',
-          listLottery: data
-        });
-      }
+  var paramSearch = { 'user': req.user.id };
+  Lottery.find(paramSearch, function (err, data) {
+    if (err) {
+      res.render('error', {
+        status: 500
+      });
+    } else {
+      res.render('lottery/index', {
+        title: 'Lottery',
+        listLottery: data
+      });
+    }
   });
 };
 
 /**
- * GET /lottery/add
- * Lottery Add lottery Page.
+ * GET /lottery/add | Add Lottery Page.
  */
 exports.getAddLottery = (req, res) => {
   res.render('lottery/add', {
@@ -29,20 +29,20 @@ exports.getAddLottery = (req, res) => {
   });
 };
 
-
+/****************************API SESSION********************************/
 /**
  * GET /api/lottery
  * Lottery Json: Get all lotteries
  */
 exports.getApiLottery = (req, res) => {
-  Lottery.find({},function(err,data){
-      if (err) {
-        res.render('error', {
-            status: 500
-        });
-      } else {
-        res.jsonp(data);
-      }
+  Lottery.find({}, function (err, data) {
+    if (err) {
+      res.render('error', {
+        status: 500
+      });
+    } else {
+      res.jsonp(data);
+    }
   });
 };
 
@@ -52,7 +52,6 @@ exports.getApiLottery = (req, res) => {
  */
 
 exports.postApiLottery = (req, res, next) => {
-  //req.assert('user', 'User is required').notEmpty();
   req.assert('result', 'Result is required').notEmpty();
   req.assert('condition', 'Condition is required').notEmpty();
   req.assert('num1', 'Number 1 is invalid').notEmpty().isInt();
@@ -73,10 +72,11 @@ exports.postApiLottery = (req, res, next) => {
     return res.redirect('/lottery/add');
   }
 
-  if(req.user){
+  if (req.user) {
     const lottery = new Lottery({
       user: req.user.id,
       result: req.body.result,
+      status: '',
       condition: req.body.condition,
       nums: {
         num1: {
@@ -123,6 +123,7 @@ exports.postApiLottery = (req, res, next) => {
  */
 exports.putApiLottery = (req, res, next) => {
   req.assert('condition', 'Condition is required').notEmpty();
+  req.assert('status', 'Status is required').notEmpty();
   req.assert('num1', 'Number 1 is invalid').notEmpty().isInt();
   req.assert('rate1', 'Rating of Number 1 is invalid').isInt();
   req.assert('num2', 'Number 2 is invalid').notEmpty().isInt();
@@ -142,43 +143,46 @@ exports.putApiLottery = (req, res, next) => {
     return res.send(JSON.stringify(errors));
   }
   const id = req.body.id;
-  if(req.user && id){
-    Lottery.update({_id: id}, {$set: {
-      condition: req.body.condition,
-      result: req.body.result,
-      nums: {
-        num1: {
-          value: req.body.num1,
-          rate: req.body.rate1
-        },
-        num2: {
-          value: req.body.num2,
-          rate: req.body.rate2
-        },
-        num3: {
-          value: req.body.num3,
-          rate: req.body.rate3
-        },
-        num4: {
-          value: req.body.num4,
-          rate: req.body.rate4
-        },
-        num5: {
-          value: req.body.num5,
-          rate: req.body.rate5
-        },
-        num6: {
-          value: req.body.num6,
-          rate: req.body.rate6
+  if (req.user && id) {
+    Lottery.update({ _id: id }, {
+      $set: {
+        condition: req.body.condition,
+        status: req.body.status,
+        result: req.body.result,
+        nums: {
+          num1: {
+            value: req.body.num1,
+            rate: req.body.rate1
+          },
+          num2: {
+            value: req.body.num2,
+            rate: req.body.rate2
+          },
+          num3: {
+            value: req.body.num3,
+            rate: req.body.rate3
+          },
+          num4: {
+            value: req.body.num4,
+            rate: req.body.rate4
+          },
+          num5: {
+            value: req.body.num5,
+            rate: req.body.rate5
+          },
+          num6: {
+            value: req.body.num6,
+            rate: req.body.rate6
+          }
         }
       }
-    }}, function(err) {
-        if (!err) {
-          res.send('notification!');
-        }
-        else {
-          res.send(err);
-        }
+    }, function (err) {
+      if (!err) {
+        res.send('notification!');
+      }
+      else {
+        res.send(err);
+      }
     });
   } else {
     res.render('account/login', {
@@ -194,8 +198,8 @@ exports.putApiLottery = (req, res, next) => {
  */
 exports.deleteApiLottery = (req, res, next) => {
   const id = req.params.id;
-  if(req.user && id){
-    Lottery.remove({ _id: id }, function(err) {
+  if (req.user && id) {
+    Lottery.remove({ _id: id }, function (err) {
       if (!err) {
         res.send('notification!');
       }
@@ -203,7 +207,6 @@ exports.deleteApiLottery = (req, res, next) => {
         res.send(err);
       }
     });
-    //res.send("asdasdas");
   } else {
     res.render('account/login', {
       title: 'Login',
