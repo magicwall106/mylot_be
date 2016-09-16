@@ -47,6 +47,35 @@ exports.postLogin = (req, res, next) => {
 };
 
 /**
+ * POST /api/login
+ * Sign in using email and password.
+ */
+exports.postApiLogin = (req, res, next) => {
+  var a = req.body.email;
+  req.assert('email', 'Email is not valid').isEmail();
+  req.assert('password', 'Password cannot be blank').notEmpty();
+  req.sanitize('email').normalizeEmail({ remove_dots: false });
+
+  const errors = req.validationErrors();
+  if(errors){
+    return res.send('errors',errors);
+  }
+
+  passport.authenticate('local', (err, user, info) => {
+    if (err) { return res.send('errors',err); }
+    if (!user) {
+      return res.send('errors',err);
+    }
+    req.logIn(user, (err) => {
+      if (err) { return res.send('errors',err);}
+        return res.send('success',user);
+    });
+  })(req, res, next);
+};
+
+
+
+/**
  * GET /logout
  * Log out.
  */

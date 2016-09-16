@@ -136,6 +136,8 @@ app.get('/recommendation', passportConfig.isAuthenticated, recommendationControl
 app.get('/recommendation/add', passportConfig.isAuthenticated, recommendationController.getAddRecommendation);
 app.get('/lottery', passportConfig.isAuthenticated, lotteryController.getLottery);
 app.get('/lottery/add', passportConfig.isAuthenticated, lotteryController.getAddLottery);
+/*USER API****************/
+app.post('/api/logintest', userController.postApiLogin);
 
 
 /**
