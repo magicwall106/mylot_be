@@ -6,44 +6,6 @@ block content
   hr
   .row
     .col-sm-3.panel.panel-primary
-      h3 Login
-      form.form-horizontal(method='POST')
-        input(type='hidden', name='_csrf', value=_csrf)
-        .form-group
-          label.col-sm-3.control-label(for='email') Email
-          .col-sm-7
-            input.form-control(type='email', name='email', id='email', placeholder='Email', autofocus, required)
-        //-.form-group
-          label.col-sm-3.control-label(for='phone') Phone
-          .col-sm-7
-            input.form-control(type='phone', name='phone', id='phone', placeholder='Phone Number', required)
-        .form-group
-          label.col-sm-3.control-label(for='password') Password
-          .col-sm-7
-            input.form-control(type='password', name='password', id='password', placeholder='Password', required)
-        .form-group
-          .col-sm-12
-            button.col-sm-6.btn.btn-primary(type='submit')
-              i.fa.fa-user
-              | Login
-            a.btn.col-sm-6.btn.btn-primary(href='/signup')
-              i.fa.fa-user
-              | Signup
-        .form-group
-          a.btn.btn-link(href='/forgot') Forgot your password?
-        .form-group
-          .col-sm-offset-3.col-sm-7
-            p #{message}
-            hr
-        .form-group
-          .col-sm-12
-            a.btn.btn-block.btn-facebook.btn-social(href='/auth/facebook')
-              i.fa.fa-facebook
-              | Sign in with Facebook
-            a.btn.btn-block.btn-google.btn-social(href='/auth/google')
-              i.fa.fa-google-plus
-              | Sign in with Google
-    .col-sm-3.panel.panel-primary
       h3 Home
       p Giá trị Jackbot  Mega 6/45 ước tính
       h4 13,232,222,111
@@ -63,6 +25,53 @@ block content
         a.btn.col-sm-6.btn.btn-primary(href='/signup')
           i.glyphicon.glyphicon-shopping-cart
           | Đặt vé
+    
+    .col-sm-3.panel.panel-primary
+      h3 Login
+      form.form-horizontal(method='POST')
+        input(type='hidden', name='_csrf', value=_csrf)
+        .form-group
+          label.col-sm-3.control-label(for='email') Email
+          .col-sm-7
+            input.form-control(type='email', name='email', id='email', placeholder='Email', autofocus, required)
+        .form-group
+          label.col-sm-3.control-label(for='password') Password
+          .col-sm-7
+            input.form-control(type='password', name='password', id='password', placeholder='Password', required)
+        .form-group
+          label.col-sm-3.control-label(for='phone') Confirm password
+          .col-sm-7
+            input.form-control(type='phone', name='phone', id='phone', placeholder='Phone Number', required)
+        .form-group
+          .col-sm-12
+            label.radio.col-sm-6
+              input(type='radio', name='gender', value='male', data-toggle='radio', checked='true')
+              span Đã có tài khoản
+            label.radio.col-sm-6
+              input(type='radio', name='gender', value='female', data-toggle='radio')
+              span Tạo tài khoản
+          .col-sm-12
+            button.col-sm-6.btn.btn-primary(type='submit')
+              i.fa.fa-user
+              | Đăng Nhập
+            a.btn.col-sm-6.btn.btn-primary(href='/signup')
+              i.fa.fa-user
+              | Đăng ký
+        .form-group
+          a.btn.btn-link(href='/forgot') Forgot your password?
+        .form-group
+          .col-sm-offset-3.col-sm-7
+            p #{message}
+            hr
+        .form-group
+          .col-sm-12
+            a.btn.btn-block.btn-facebook.btn-social(href='/auth/facebook')
+              i.fa.fa-facebook
+              | Sign in with Facebook
+            a.btn.btn-block.btn-google.btn-social(href='/auth/google')
+              i.fa.fa-google-plus
+              | Sign in with Google
+    
     .col-sm-3.panel.panel-primary
       h3 Gợi ý
       p Gợi ý gần đây
@@ -75,6 +84,7 @@ block content
             th.text-center Số 4
             th.text-center Số 5
             th.text-center Số 6
+            th
         tbody
           tr
             td.text-center 1
@@ -83,6 +93,9 @@ block content
             td.text-center 33
             td.text-center.bg-success 0
             td.text-center 11
+            td
+              a(href='#')
+                span.badge v
           tr
             td.text-center 1
             td.text-center.bg-success 22
@@ -90,6 +103,9 @@ block content
             td.text-center.bg-success 33
             td.text-center.bg-success 0
             td.text-center 22
+            td
+              a(href='#')
+                span.badge 3
           tr
             td.text-center 1
             td.text-center.bg-success 22
@@ -97,6 +113,9 @@ block content
             td.text-center.bg-success 33
             td.text-center 0
             td.text-center.bg-success 21
+            td
+              a(href='#')
+                span.badge 3
       hr
       form.form-horizontal(method='POST')
         input(type='hidden', name='_csrf', value=_csrf)
@@ -234,6 +253,7 @@ block content
             th.text-center Số 4
             th.text-center Số 5
             th.text-center Số 6
+            th
         tbody
           tr
             td.text-center 1
@@ -242,6 +262,9 @@ block content
             td.text-center 33
             td.text-center.bg-success 0
             td.text-center 11
+            td
+              a(href='#')
+                span.badge x
           tr
             td.text-center 1
             td.text-center.bg-success 22
@@ -249,6 +272,9 @@ block content
             td.text-center.bg-success 33
             td.text-center.bg-success 0
             td.text-center 22
+            td
+              a(href='#')
+                span.badge v
           tr
             td.text-center 1
             td.text-center.bg-success 22
@@ -256,6 +282,9 @@ block content
             td.text-center.bg-success 33
             td.text-center 0
             td.text-center.bg-success 21
+            td
+              a(href='#')
+                span.badge v
       hr
       .col-sm-12
         select.col-sm-2
@@ -294,20 +323,114 @@ block content
           option .
           option .
           option 45
-      hr
-      form.form-horizontal(method='POST')
+        hr
+        form.form-horizontal(method='POST')
+          input(type='hidden', name='_csrf', value=_csrf)
+          .col-sm-12
+            button.col-sm-6.btn.btn-primary(type='submit')
+              i.glyphicon.glyphicon-eye-open
+              | Gợi ý
+            a.btn.col-sm-6.btn.btn-primary(href='/signup')
+              i.glyphicon.glyphicon-shopping-cart
+              | Thanh toán
+    .col-sm-3.panel.panel-primary
+      h3 Thông tin cá nhân
+      form.form-horizontal(action='/account/profile', method='POST')
         input(type='hidden', name='_csrf', value=_csrf)
         .form-group
-          label.col-sm-3.control-label(for='conditoin') Gợi ý theo
+          label.col-sm-3.control-label(for='email') Email
           .col-sm-7
-            select.form-control(id='condition' name='condition')
-              option Emtion
-              option Hight rate
-              option Low rate
-              option Most popular
-              option Least popular
+            input.form-control(type='email', name='email', id='email')
         .form-group
-          .col-sm-12
-            button.btn-block.col-sm-6.btn.btn-primary(type='submit')
-              i.glyphicon.glyphicon-eye-open
-              | Thêm Gợi ý
+          label.col-sm-3.control-label(for='name') Name
+          .col-sm-7
+            input.form-control(type='text', name='name', id='name')
+        .form-group
+          label.col-sm-3.control-label Gender
+          .col-sm-6
+            label.radio.col-sm-3
+              input(type='radio', name='gender', value='male', data-toggle='radio')
+              span Male
+            label.radio.col-sm-3
+              input(type='radio', name='gender', value='female', data-toggle='radio')
+              span Female
+            label.radio.col-sm-3
+              input(type='radio', name='gender', value='other', data-toggle='radio')
+              span Other
+        .form-group
+          label.col-sm-3.control-label(for='location') Location
+          .col-sm-7
+            input.form-control(type='text', name='location', id='location')
+        .form-group
+          label.col-sm-3.control-label(for='website') Website
+          .col-sm-7
+            input.form-control(type='text', name='website', id='website')
+        .form-group
+          label.col-sm-3.control-label Gravatar
+          .col-sm-4
+            img(class='profile', width='100', height='100')
+        .form-group
+          .col-sm-offset-3.col-sm-4
+            button.btn.btn.btn-primary(type='submit')
+              i.fa.fa-pencil
+              | Update Profile
+    .col-sm-3.panel.panel-primary
+      .page-header
+        h3 Change Password
+      form.form-horizontal(action='/account/password', method='POST')
+        input(type='hidden', name='_csrf', value=_csrf)
+        .form-group
+          label.col-sm-3.control-label(for='password') New Password
+          .col-sm-7
+            input.form-control(type='password', name='password', id='password')
+        .form-group
+          label.col-sm-3.control-label(for='confirmPassword') Confirm Password
+          .col-sm-7
+            input.form-control(type='password', name='confirmPassword', id='confirmPassword')
+        .form-group
+          .col-sm-offset-3.col-sm-4
+            button.btn.btn-primary(type='submit')
+              i.fa.fa-lock
+              | Change Password
+      .page-header
+        h3 Linked Accounts
+      .form-horizontal
+        .col-sm-offset-3.col-sm-10
+          if 'true'
+            p: a.text-danger(href='/account/unlink/google') Unlink Google account
+          else
+            p: a(href='/auth/google') Link Google account
+        .col-sm-offset-3.col-sm-10
+          if true
+            p: a.text-danger(href='/account/unlink/facebook') Unlink Facebook account
+          else
+            p: a(href='/auth/facebook') Link Facebook account
+    .col-sm-3.panel.panel-primary
+      h3 Quên mật khẩu
+      .col-sm-8.col-sm-offset-2
+        form(method='POST')
+          legend Forgot Password
+          input(type='hidden', name='_csrf', value=_csrf)
+          .form-group
+            p Enter your email address below and we will send you password reset instructions.
+            label.control-label(for='email') Email
+            input.form-control(type='email', name='email', id='email', placeholder='Email', autofocus, required)
+          .form-group
+            button.btn.btn-primary(type='submit')
+              i.fa.fa-key
+              | Reset Password
+    .col-sm-3.panel.panel-primary
+      h3 Nhập mật khẩu mới
+      .col-sm-8.col-sm-offset-2
+        form(method='POST')
+          input(type='hidden', name='_csrf', value=_csrf)
+          .form-group
+            label(for='password') New Password
+            input.form-control(type='password', name='password', id='password', placeholder='New password', autofocus, required)
+          .form-group
+            label(for='confirm') Confirm Password
+            input.form-control(type='password', name='confirm', id='confirm', placeholder='Confirm password', required)
+          .form-group
+            button.btn.btn-primary.btn-reset(type='submit')
+              i.fa.fa-keyboard-o
+              | Change Password
