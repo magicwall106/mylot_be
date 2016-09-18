@@ -137,8 +137,13 @@ app.get('/recommendation/add', passportConfig.isAuthenticated, recommendationCon
 app.get('/lottery', passportConfig.isAuthenticated, lotteryController.getLottery);
 app.get('/lottery/add', passportConfig.isAuthenticated, lotteryController.getAddLottery);
 /*USER API****************/
-app.post('/api/logintest', userController.postApiLogin);
-
+app.post('/api/login', userController.postApiLogin);
+app.post('/api/signup', userController.postApiSignup);
+app.post('/api/account/profile', passportConfig.isAuthenticated, userController.postApiUpdateProfile);
+app.post('/api/account/password', passportConfig.isAuthenticated, userController.postApiUpdatePassword);
+app.get('/api/account/unlink/:provider', passportConfig.isAuthenticated, userController.getApiOauthUnlink);
+app.get('/api/reset/:token', userController.postApiReset);
+app.post('/api/forgot', userController.postApiForgot);
 
 /**
  * API result.

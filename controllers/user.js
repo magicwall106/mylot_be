@@ -139,6 +139,46 @@ exports.postSignup = (req, res, next) => {
 };
 
 /**
+ * POST /api/signup
+ * Create a new local account.
+ */
+exports.postApiSignup = (req, res, next) => {
+  req.assert('email', 'Email is not valid').isEmail();
+  req.assert('password', 'Password must be at least 4 characters long').len(4);
+  req.assert('confirmPassword', 'Passwords do not match').equals(req.body.password);
+  req.sanitize('email').normalizeEmail({ remove_dots: false });
+
+  const errors = req.validationErrors();
+
+  if (errors) {
+    return res.send('errors' ,errors);
+  }
+
+  const user = new User({
+    email: req.body.email,
+    password: req.body.password,
+    phone: req.body.phone || '',
+    role: process.env.ROLE_USER
+  });
+
+  User.findOne({ email: req.body.email }, (err, existingUser) => {
+    if (existingUser) {
+      return res.send('errors', { msg: 'Account with that email address already exists.' });
+    }
+    user.save((err) => {
+      if (err) { return res.send('errors' ,err); }
+      req.logIn(user, (err) => {
+        if (err) {
+          return res.send('errors' ,err);
+        }
+        user.password = '';
+        return res.send('success',user);
+      });
+    });
+  });
+};
+
+/**
  * GET /account
  * Profile page.
  */
@@ -185,6 +225,39 @@ exports.postUpdateProfile = (req, res, next) => {
 };
 
 /**
+ * POST /api/account/profile
+ * Update profile information.
+ */
+exports.postApiUpdateProfile = (req, res, next) => {
+  req.assert('email', 'Please enter a valid email address.').isEmail();
+  req.sanitize('email').normalizeEmail({ remove_dots: false });
+
+  const errors = req.validationErrors();
+
+  if (errors) {
+    return res.send('errors' ,errors);
+  }
+
+  User.findById(req.user.id, (err, user) => {
+    if (err) { return res.send('errors' ,err); }
+    user.email = req.body.email || '';
+    user.profile.name = req.body.name || '';
+    user.profile.gender = req.body.gender || '';
+    user.profile.location = req.body.location || '';
+    user.profile.website = req.body.website || '';
+    user.save((err) => {
+      if (err) {
+        if (err.code === 11000) {
+          return res.send('errors' ,{ msg: 'The email address you have entered is already associated with an account.' });
+        }
+        return res.send('errors' ,err);;
+      }
+      return res.send('success', user);
+    });
+  });
+};
+
+/**
  * POST /account/password
  * Update current password.
  */
@@ -206,6 +279,28 @@ exports.postUpdatePassword = (req, res, next) => {
       if (err) { return next(err); }
       req.flash('success', { msg: 'Password has been changed.' });
       res.redirect('/account');
+    });
+  });
+};
+
+/**
+ * POST /api/account/password
+ * Update current password.
+ */
+exports.postApiUpdatePassword = (req, res, next) => {
+  req.assert('password', 'Password must be at least 4 characters long').len(4);
+  req.assert('confirmPassword', 'Passwords do not match').equals(req.body.password);
+
+  if (errors) {
+    return res.send('errors' ,errors);
+  }
+
+  User.findById(req.user.id, (err, user) => {
+    if (err) { return res.send('errors' ,err); }
+    user.password = req.body.password;
+    user.save((err) => {
+      if (err) { return res.send('errors' ,err); }
+      return res.send('success' ,{ msg: 'Password has been changed.' });
     });
   });
 };
@@ -237,6 +332,23 @@ exports.getOauthUnlink = (req, res, next) => {
       if (err) { return next(err); }
       req.flash('info', { msg: `${provider} account has been unlinked.` });
       res.redirect('/account');
+    });
+  });
+};
+
+/**
+ * GET /api/account/unlink/:provider
+ * Unlink OAuth provider.
+ */
+exports.getApiOauthUnlink = (req, res, next) => {
+  const provider = req.params.provider;
+  User.findById(req.user.id, (err, user) => {
+    if (err) { return res.send('errors' ,err); }
+    user[provider] = undefined;
+    user.tokens = user.tokens.filter(token => token.kind !== provider);
+    user.save((err) => {
+      if (err) { return res.send('errors' ,err); }
+      return res.send('success' ,{ msg: `${provider} account has been unlinked.` })
     });
   });
 };
@@ -274,7 +386,7 @@ exports.postReset = (req, res, next) => {
 
   const errors = req.validationErrors();
 
-  if (errors) {
+if (errors) {
     req.flash('errors', errors);
     return res.redirect('back');
   }
@@ -323,6 +435,66 @@ exports.postReset = (req, res, next) => {
   ], (err) => {
     if (err) { return next(err); }
     res.redirect('/');
+  });
+};
+
+/**
+ * POST /api/reset/:token
+ * Process the reset password request.
+ */
+exports.postApiReset = (req, res, next) => {
+  req.assert('password', 'Password must be at least 4 characters long.').len(4);
+  req.assert('confirm', 'Passwords must match.').equals(req.body.password);
+
+  const errors = req.validationErrors();
+
+  if (errors) {
+    return res.send('errors', errors);
+  }
+
+  async.waterfall([
+    function (done) {
+      User
+        .findOne({ passwordResetToken: req.params.token })
+        .where('passwordResetExpires').gt(Date.now())
+        .exec((err, user) => {
+          if (err) { return res.send('errors', err); }
+          if (!user) {
+            return res.send('errors', { msg: 'Password reset token is invalid or has expired.' });
+          }
+          user.password = req.body.password;
+          user.passwordResetToken = undefined;
+          user.passwordResetExpires = undefined;
+          user.save((err) => {
+            if (err) { return res.send('errors', err) }
+            req.logIn(user, (err) => {
+              done(err, user);
+            });
+          });
+        });
+    },
+    function (user, done) {
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: process.env.GMAIL_USERID,
+          pass: process.env.GMAIL_PASSWORD
+        }
+      });
+      const mailOptions = {
+        to: user.email,
+        from: 'mylot@starter.com',
+        subject: 'Your Hackathon Starter password has been changed',
+        text: `Hello,\n\nThis is a confirmation that the password for your account ${user.email} has just been changed.\n`
+      };
+      transporter.sendMail(mailOptions, (err) => {
+        done(err);
+        return res.send('success', { msg: 'Success! Your password has been changed.' })
+      });
+    }
+  ], (err) => {
+    if (err) { return res.send('errors', err) }
+    return res.send('success', { msg: 'Success! Your password has been changed.' })
   });
 };
 
@@ -399,5 +571,66 @@ exports.postForgot = (req, res, next) => {
   ], (err) => {
     if (err) { return next(err); }
     res.redirect('/forgot');
+  });
+};
+
+/**
+ * POST /api/forgot
+ * Create a random token, then the send user an email with a reset link.
+ */
+exports.postApiForgot = (req, res, next) => {
+  req.assert('email', 'Please enter a valid email address.').isEmail();
+  req.sanitize('email').normalizeEmail({ remove_dots: false });
+
+  const errors = req.validationErrors();
+
+  if (errors) {
+    return res.send('errors' ,errors);
+  }
+
+  async.waterfall([
+    function (done) {
+      crypto.randomBytes(16, (err, buf) => {
+        const token = buf.toString('hex');
+        done(err, token);
+      });
+    },
+    function (token, done) {
+      User.findOne({ email: req.body.email }, (err, user) => {
+        if (!user) {
+          return res.send('errors' , { msg: 'Account with that email address does not exist.' });
+        }
+        user.passwordResetToken = token;
+        user.passwordResetExpires = Date.now() + 3600000; // 1 hour
+        user.save((err) => {
+          done(err, token, user);
+        });
+      });
+    },
+    function (token, user, done) {
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: process.env.GMAIL_USERID,
+          pass: process.env.GMAIL_PASSWORD
+        }
+      });
+      const mailOptions = {
+        to: user.email,
+        from: 'mylot@starter.com',
+        subject: 'Reset your password on Hackathon Starter',
+        text: `You are receiving this email because you (or someone else) have requested the reset of the password for your account.\n\n
+          Please click on the following link, or paste this into your browser to complete the process:\n\n
+          http://${req.headers.host}/reset/${token}\n\n
+          If you did not request this, please ignore this email and your password will remain unchanged.\n`
+      };
+      transporter.sendMail(mailOptions, (err) => {
+        done(err);
+        return res.send('success' , { msg: `An e-mail has been sent to ${user.email} with further instructions.` });
+      });
+    }
+  ], (err) => {
+    if (err) { return res.send('errors', err) }
+    return res.send('success' , { mss: '/forgot' });
   });
 };
