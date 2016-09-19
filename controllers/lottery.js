@@ -35,14 +35,15 @@ exports.getAddLottery = (req, res) => {
  * Lottery Json: Get all lotteries
  */
 exports.getApiLottery = (req, res) => {
-  Lottery.find({}, function (err, data) {
+  const limit = Math.max(10, req.query.limit || 0);
+  const page = Math.max(0, req.query.page || 0);
+  var paramSearch = { 'user': req.user.id };
+  Lottery.paginate(paramSearch, { offset: limit * page, limit: limit }, function(err, result) {
     if (err) {
-      res.render('error', {
-        status: 500
-      });
-    } else {
-      res.jsonp(data);
-    }
+        res.status(500).json(err);
+      } else {
+        res.status(200).json(result);
+      }
   });
 };
 

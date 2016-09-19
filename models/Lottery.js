@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const mongoosePaginate = require('mongoose-paginate');
 
 const lotterySchema = new mongoose.Schema({
   result: {
@@ -49,7 +50,7 @@ const lotterySchema = new mongoose.Schema({
     }
   }
 }, { timestamps: true });
-
+lotterySchema.plugin(mongoosePaginate);
 /**
  * Password hash middleware.
  */

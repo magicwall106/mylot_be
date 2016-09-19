@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const mongoosePaginate = require('mongoose-paginate');
 
 const resultSchema = new mongoose.Schema({
   code: { type: String, unique: true },
@@ -19,7 +20,7 @@ const resultSchema = new mongoose.Schema({
     award4: Number
   }
 }, { timestamps: true });
-
+resultSchema.plugin(mongoosePaginate);
 /**
  * Password hash middleware.
  */

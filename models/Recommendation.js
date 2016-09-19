@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const mongoosePaginate = require('mongoose-paginate');
 
 const recommendationSchema = new mongoose.Schema({
   result: {
@@ -49,6 +50,7 @@ const recommendationSchema = new mongoose.Schema({
     }
   }
 }, { timestamps: true });
+recommendationSchema.plugin(mongoosePaginate);
 
 recommendationSchema.pre('save', function (next) {
   console.log('INFO-RECOMMENDATION: Saving recommendation date: ');

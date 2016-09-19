@@ -1,11 +1,10 @@
 const Result = require('../models/Result');
-
 /**
  * GET /result
  * Result Index Page.
  */
 exports.getResult = (req, res) => {
-  Result.find({}, function (err, data) {
+  Result.find().exec(function (err, data) {
     if (err) {
       res.render('error', {
         status: 500
@@ -177,11 +176,13 @@ exports.deleteApiResult = (req, res, next) => {
  * Result Json: Get all results
  */
 exports.getApiResult = (req, res) => {
-  Result.find({}, function (err, data) {
+  const limit = Math.max(10, req.query.limit || 0);
+  const page = Math.max(0, req.query.page || 0);
+  Result.paginate({}, { offset: limit * page, limit: limit }, function(err, result) {
     if (err) {
-      res.status(500).json(err);
-    } else {
-      res.status(200).json(data);
-    }
+        res.status(500).json(err);
+      } else {
+        res.status(200).json(result);
+      }
   });
 };

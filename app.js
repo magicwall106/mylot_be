@@ -48,6 +48,7 @@ const app = express();
 /**
  * Connect to MongoDB.
  */
+mongoose.Promise = global.Promise;
 mongoose.connect(process.env.MONGODB_URI || process.env.MONGOLAB_URI);
 mongoose.connection.on('connected', () => {
   console.log('%s MongoDB connection established!', chalk.green('✓'));
@@ -161,18 +162,18 @@ app.delete('/api/result/:id', resultController.deleteApiResult);
 /**
  * API recommendation.
  */
-app.get('/api/recommendation', passportConfig.isAuthenticated, recommendationController.getApiRecommendation);
-app.put('/api/recommendation', passportConfig.isAuthenticated, recommendationController.putApiRecommendation);
-app.post('/api/recommendation', passportConfig.isAuthenticated, recommendationController.postApiRecommendation);
-app.delete('/api/recommendation/:id', passportConfig.isAuthenticated, recommendationController.deleteApiRecommendation);
+app.get('/api/recommendation', passportConfig.isApiAuthenticated, recommendationController.getApiRecommendation);
+app.put('/api/recommendation', passportConfig.isApiAuthenticated, recommendationController.putApiRecommendation);
+app.post('/api/recommendation', passportConfig.isApiAuthenticated, recommendationController.postApiRecommendation);
+app.delete('/api/recommendation/:id', passportConfig.isApiAuthenticated, recommendationController.deleteApiRecommendation);
 
 /**
  * API lottery.
  */
-app.get('/api/lottery', passportConfig.isAuthenticated, lotteryController.getApiLottery);
-app.put('/api/lottery', passportConfig.isAuthenticated, lotteryController.putApiLottery);
-app.post('/api/lottery', passportConfig.isAuthenticated, lotteryController.postApiLottery);
-app.delete('/api/lottery/:id', passportConfig.isAuthenticated, lotteryController.deleteApiLottery);
+app.get('/api/lottery', passportConfig.isApiAuthenticated, lotteryController.getApiLottery);
+app.put('/api/lottery', passportConfig.isApiAuthenticated, lotteryController.putApiLottery);
+app.post('/api/lottery', passportConfig.isApiAuthenticated, lotteryController.postApiLottery);
+app.delete('/api/lottery/:id', passportConfig.isApiAuthenticated, lotteryController.deleteApiLottery);
 /**
  * API examples routes.
  */
