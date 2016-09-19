@@ -39,8 +39,9 @@ exports.getAddRecommendation = (req, res) => {
 exports.getApiRecommendation = (req, res) => {
   const limit = Math.max(10, req.query.limit || 0);
   const page = Math.max(0, req.query.page || 0);
-  var paramSearch = { 'user': req.user.id };
-  Recommendation.paginate(paramSearch, { offset: limit * page, limit: limit }, function(err, result) {
+  const paramSearch = { 'user': req.user.id };
+  const sort = {updatedAt: 'desc'};
+  Recommendation.paginate(paramSearch, { offset: limit * page, limit: limit, sort: sort }, function(err, result) {
     if (err) {
         res.status(500).json(err);
       } else {

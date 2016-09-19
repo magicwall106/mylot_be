@@ -178,7 +178,8 @@ exports.deleteApiResult = (req, res, next) => {
 exports.getApiResult = (req, res) => {
   const limit = Math.max(10, req.query.limit || 0);
   const page = Math.max(0, req.query.page || 0);
-  Result.paginate({}, { offset: limit * page, limit: limit }, function(err, result) {
+  const sort = {resultDate: 'desc'};
+  Result.paginate({}, { offset: limit * page, limit: limit, sort: sort }, function(err, result) {
     if (err) {
         res.status(500).json(err);
       } else {
