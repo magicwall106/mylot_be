@@ -67,7 +67,7 @@ exports.postApiLogin = (req, res, next) => {
       return res.send('errors', info);
     }
     req.logIn(user, (err) => {
-      if (err) { return res.send('errors', err); }
+      if (err) { return res.status(500).send(err); }
       return res.send('success', user);
     });
   })(req, res, next);
