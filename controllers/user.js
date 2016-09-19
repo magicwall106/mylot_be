@@ -48,7 +48,7 @@ exports.postLogin = (req, res, next) => {
 
 /**
  * POST /api/login
- * Sign in using email and password.
+ * API Sign in using email and password.
  */
 exports.postApiLogin = (req, res, next) => {
   var a = req.body.email;
@@ -57,18 +57,18 @@ exports.postApiLogin = (req, res, next) => {
   req.sanitize('email').normalizeEmail({ remove_dots: false });
 
   const errors = req.validationErrors();
-  if(errors){
-    return res.send('errors',errors);
+  if (errors) {
+    return res.send('errors', errors);
   }
 
   passport.authenticate('local', (err, user, info) => {
-    if (err) { return res.send('errors',err); }
+    if (err) { return res.send('errors', err); }
     if (!user) {
-      return res.send('errors',err);
+      return res.send('errors', info);
     }
     req.logIn(user, (err) => {
-      if (err) { return res.send('errors',err);}
-        return res.send('success',user);
+      if (err) { return res.send('errors', err); }
+      return res.send('success', user);
     });
   })(req, res, next);
 };
@@ -82,6 +82,15 @@ exports.postApiLogin = (req, res, next) => {
 exports.logout = (req, res) => {
   req.logout();
   res.redirect('/');
+};
+
+/**
+ * GET /api/logout
+ * API Log out.
+ */
+exports.postApiLogout = (req, res) => {
+  req.logout();
+  return res.send('success', { msg: 'Logout Success' });
 };
 
 /**
@@ -140,7 +149,7 @@ exports.postSignup = (req, res, next) => {
 
 /**
  * POST /api/signup
- * Create a new local account.
+ * API Create a new local account.
  */
 exports.postApiSignup = (req, res, next) => {
   req.assert('email', 'Email is not valid').isEmail();
@@ -151,7 +160,7 @@ exports.postApiSignup = (req, res, next) => {
   const errors = req.validationErrors();
 
   if (errors) {
-    return res.send('errors' ,errors);
+    return res.send('errors', errors);
   }
 
   const user = new User({
@@ -166,13 +175,13 @@ exports.postApiSignup = (req, res, next) => {
       return res.send('errors', { msg: 'Account with that email address already exists.' });
     }
     user.save((err) => {
-      if (err) { return res.send('errors' ,err); }
+      if (err) { return res.send('errors', err); }
       req.logIn(user, (err) => {
         if (err) {
-          return res.send('errors' ,err);
+          return res.send('errors', err);
         }
         user.password = '';
-        return res.send('success',user);
+        return res.send('success', user);
       });
     });
   });
@@ -226,7 +235,7 @@ exports.postUpdateProfile = (req, res, next) => {
 
 /**
  * POST /api/account/profile
- * Update profile information.
+ * API Update profile information.
  */
 exports.postApiUpdateProfile = (req, res, next) => {
   req.assert('email', 'Please enter a valid email address.').isEmail();
@@ -235,11 +244,11 @@ exports.postApiUpdateProfile = (req, res, next) => {
   const errors = req.validationErrors();
 
   if (errors) {
-    return res.send('errors' ,errors);
+    return res.send('errors', errors);
   }
 
   User.findById(req.user.id, (err, user) => {
-    if (err) { return res.send('errors' ,err); }
+    if (err) { return res.send('errors', err); }
     user.email = req.body.email || '';
     user.profile.name = req.body.name || '';
     user.profile.gender = req.body.gender || '';
@@ -248,9 +257,9 @@ exports.postApiUpdateProfile = (req, res, next) => {
     user.save((err) => {
       if (err) {
         if (err.code === 11000) {
-          return res.send('errors' ,{ msg: 'The email address you have entered is already associated with an account.' });
+          return res.send('errors', { msg: 'The email address you have entered is already associated with an account.' });
         }
-        return res.send('errors' ,err);;
+        return res.send('errors', err);;
       }
       return res.send('success', user);
     });
@@ -285,22 +294,22 @@ exports.postUpdatePassword = (req, res, next) => {
 
 /**
  * POST /api/account/password
- * Update current password.
+ * API Update current password.
  */
 exports.postApiUpdatePassword = (req, res, next) => {
   req.assert('password', 'Password must be at least 4 characters long').len(4);
   req.assert('confirmPassword', 'Passwords do not match').equals(req.body.password);
 
   if (errors) {
-    return res.send('errors' ,errors);
+    return res.send('errors', errors);
   }
 
   User.findById(req.user.id, (err, user) => {
-    if (err) { return res.send('errors' ,err); }
+    if (err) { return res.send('errors', err); }
     user.password = req.body.password;
     user.save((err) => {
-      if (err) { return res.send('errors' ,err); }
-      return res.send('success' ,{ msg: 'Password has been changed.' });
+      if (err) { return res.send('errors', err); }
+      return res.send('success', { msg: 'Password has been changed.' });
     });
   });
 };
@@ -338,17 +347,17 @@ exports.getOauthUnlink = (req, res, next) => {
 
 /**
  * GET /api/account/unlink/:provider
- * Unlink OAuth provider.
+ * API Unlink OAuth provider.
  */
 exports.getApiOauthUnlink = (req, res, next) => {
   const provider = req.params.provider;
   User.findById(req.user.id, (err, user) => {
-    if (err) { return res.send('errors' ,err); }
+    if (err) { return res.send('errors', err); }
     user[provider] = undefined;
     user.tokens = user.tokens.filter(token => token.kind !== provider);
     user.save((err) => {
-      if (err) { return res.send('errors' ,err); }
-      return res.send('success' ,{ msg: `${provider} account has been unlinked.` })
+      if (err) { return res.send('errors', err); }
+      return res.send('success', { msg: `${provider} account has been unlinked.` })
     });
   });
 };
@@ -386,7 +395,7 @@ exports.postReset = (req, res, next) => {
 
   const errors = req.validationErrors();
 
-if (errors) {
+  if (errors) {
     req.flash('errors', errors);
     return res.redirect('back');
   }
@@ -440,7 +449,7 @@ if (errors) {
 
 /**
  * POST /api/reset/:token
- * Process the reset password request.
+ * API Process the reset password request.
  */
 exports.postApiReset = (req, res, next) => {
   req.assert('password', 'Password must be at least 4 characters long.').len(4);
@@ -585,7 +594,7 @@ exports.postApiForgot = (req, res, next) => {
   const errors = req.validationErrors();
 
   if (errors) {
-    return res.send('errors' ,errors);
+    return res.send('errors', errors);
   }
 
   async.waterfall([
@@ -598,7 +607,7 @@ exports.postApiForgot = (req, res, next) => {
     function (token, done) {
       User.findOne({ email: req.body.email }, (err, user) => {
         if (!user) {
-          return res.send('errors' , { msg: 'Account with that email address does not exist.' });
+          return res.send('errors', { msg: 'Account with that email address does not exist.' });
         }
         user.passwordResetToken = token;
         user.passwordResetExpires = Date.now() + 3600000; // 1 hour
@@ -626,11 +635,11 @@ exports.postApiForgot = (req, res, next) => {
       };
       transporter.sendMail(mailOptions, (err) => {
         done(err);
-        return res.send('success' , { msg: `An e-mail has been sent to ${user.email} with further instructions.` });
+        return res.send('success', { msg: `An e-mail has been sent to ${user.email} with further instructions.` });
       });
     }
   ], (err) => {
     if (err) { return res.send('errors', err) }
-    return res.send('success' , { mss: '/forgot' });
+    return res.send('success', { mss: '/forgot' });
   });
 };

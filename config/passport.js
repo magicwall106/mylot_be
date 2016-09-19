@@ -178,6 +178,16 @@ exports.isAuthenticated = (req, res, next) => {
 };
 
 /**
+ * API Login Required middleware.
+ */
+exports.isApiAuthenticated = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  return res.send('errors', {msg: 'Is not Authenticated'});
+};
+
+/**
  * Authorization Required middleware.
  */
 exports.isAuthorized = (req, res, next) => {

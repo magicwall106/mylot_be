@@ -130,44 +130,49 @@ app.post('/account/profile', passportConfig.isAuthenticated, userController.post
 app.post('/account/password', passportConfig.isAuthenticated, userController.postUpdatePassword);
 app.post('/account/delete', passportConfig.isAuthenticated, userController.postDeleteAccount);
 app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userController.getOauthUnlink);
+
 app.get('/result', passportConfig.isAuthenticated, resultController.getResult);
 app.get('/result/add', passportConfig.isAuthenticated, resultController.getAddResult);
 app.get('/recommendation', passportConfig.isAuthenticated, recommendationController.getRecommendation);
 app.get('/recommendation/add', passportConfig.isAuthenticated, recommendationController.getAddRecommendation);
 app.get('/lottery', passportConfig.isAuthenticated, lotteryController.getLottery);
 app.get('/lottery/add', passportConfig.isAuthenticated, lotteryController.getAddLottery);
+
 /*USER API****************/
 app.post('/api/login', userController.postApiLogin);
+app.post('/api/logout', userController.postApiLogout);
 app.post('/api/signup', userController.postApiSignup);
-app.post('/api/account/profile', passportConfig.isAuthenticated, userController.postApiUpdateProfile);
-app.post('/api/account/password', passportConfig.isAuthenticated, userController.postApiUpdatePassword);
-app.get('/api/account/unlink/:provider', passportConfig.isAuthenticated, userController.getApiOauthUnlink);
+app.post('/api/account/profile', passportConfig.isApiAuthenticated, userController.postApiUpdateProfile);
+app.post('/api/account/password', passportConfig.isApiAuthenticated, userController.postApiUpdatePassword);
+app.get('/api/account/unlink/:provider', passportConfig.isApiAuthenticated, userController.getApiOauthUnlink);
 app.get('/api/reset/:token', userController.postApiReset);
 app.post('/api/forgot', userController.postApiForgot);
+
+app.post('/api/contact', contactController.postApiContact);
 
 /**
  * API result.
  */
-app.get('/api/result', /*passportConfig.isAuthenticated, */resultController.getApiResult);
-app.put('/api/result', /*passportConfig.isAuthenticated, */resultController.putApiResult);
-app.post('/api/result', /*passportConfig.isAuthenticated, */resultController.postApiResult);
-app.delete('/api/result/:id', /*passportConfig.isAuthenticated, */resultController.deleteApiResult);
+app.get('/api/result', resultController.getApiResult);
+app.put('/api/result', resultController.putApiResult);
+app.post('/api/result', resultController.postApiResult);
+app.delete('/api/result/:id', resultController.deleteApiResult);
 
 /**
  * API recommendation.
  */
-app.get('/api/recommendation', /*passportConfig.isAuthenticated, */recommendationController.getApiRecommendation);
-app.put('/api/recommendation', /*passportConfig.isAuthenticated, */recommendationController.putApiRecommendation);
-app.post('/api/recommendation', /*passportConfig.isAuthenticated, */recommendationController.postApiRecommendation);
-app.delete('/api/recommendation/:id', /*passportConfig.isAuthenticated, */recommendationController.deleteApiRecommendation);
+app.get('/api/recommendation', passportConfig.isAuthenticated, recommendationController.getApiRecommendation);
+app.put('/api/recommendation', passportConfig.isAuthenticated, recommendationController.putApiRecommendation);
+app.post('/api/recommendation', passportConfig.isAuthenticated, recommendationController.postApiRecommendation);
+app.delete('/api/recommendation/:id', passportConfig.isAuthenticated, recommendationController.deleteApiRecommendation);
 
 /**
  * API lottery.
  */
-app.get('/api/lottery', /*passportConfig.isAuthenticated, */lotteryController.getApiLottery);
-app.put('/api/lottery', /*passportConfig.isAuthenticated, */lotteryController.putApiLottery);
-app.post('/api/lottery', /*passportConfig.isAuthenticated, */lotteryController.postApiLottery);
-app.delete('/api/lottery/:id', /*passportConfig.isAuthenticated, */lotteryController.deleteApiLottery);
+app.get('/api/lottery', passportConfig.isAuthenticated, lotteryController.getApiLottery);
+app.put('/api/lottery', passportConfig.isAuthenticated, lotteryController.putApiLottery);
+app.post('/api/lottery', passportConfig.isAuthenticated, lotteryController.postApiLottery);
+app.delete('/api/lottery/:id', passportConfig.isAuthenticated, lotteryController.deleteApiLottery);
 /**
  * API examples routes.
  */
