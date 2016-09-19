@@ -90,7 +90,7 @@ exports.logout = (req, res) => {
  */
 exports.postApiLogout = (req, res) => {
   req.logout();
-  return res.res.status(200).json({ msg: 'Logout Success' });
+  return res.status(200).json({ msg: 'Logout Success' });
 };
 
 /**
