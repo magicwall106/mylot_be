@@ -62,7 +62,7 @@ exports.postApiContact = (req, res) => {
   const errors = req.validationErrors();
 
   if (errors) {
-    return res.send('errors', errors);
+    return res.status(500).json(errors);
   }
 
   const mailOptions = {
@@ -76,6 +76,6 @@ exports.postApiContact = (req, res) => {
     if (err) {
       return res.send('errors', { msg: err.message });
     }
-    res.send('success', { msg: 'Email has been sent successfully!' });
+    res.status(200).json({ msg: 'Email has been sent successfully!' });
   });
 };

@@ -140,7 +140,7 @@ exports.putApiLottery = (req, res, next) => {
   const errors = req.validationErrors();
   if (errors) {
     req.flash('errors', errors);
-    return res.send(JSON.stringify(errors));
+    return res.status(500).json(errors);
   }
   const id = req.body.id;
   if (req.user && id) {
@@ -178,10 +178,10 @@ exports.putApiLottery = (req, res, next) => {
       }
     }, function (err) {
       if (!err) {
-        res.send('notification!');
+        res.status(200).send('notification!');
       }
       else {
-        res.send(err);
+        res.status(500).json(err);
       }
     });
   } else {
@@ -201,10 +201,10 @@ exports.deleteApiLottery = (req, res, next) => {
   if (req.user && id) {
     Lottery.remove({ _id: id }, function (err) {
       if (!err) {
-        res.send('notification!');
+        res.status(200).send('notification!');
       }
       else {
-        res.send(err);
+        res.status(500).json(err);
       }
     });
   } else {

@@ -184,8 +184,7 @@ exports.isApiAuthenticated = (req, res, next) => {
   if (req.isAuthenticated()) {
     return next();
   }
-  res.status(500);
-  return res.send('Is not Authenticated');
+  return res.status(500).send('Is not Authenticated');
 };
 
 /**

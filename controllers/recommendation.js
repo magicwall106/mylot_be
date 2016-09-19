@@ -142,7 +142,7 @@ exports.putApiRecommendation = (req, res, next) => {
   const errors = req.validationErrors();
   if (errors) {
     req.flash('errors', errors);
-    return res.send(JSON.stringify(errors));
+    return res.status(500).json(errors);
   }
   const id = req.body.id;
   if (req.user && id) {
@@ -180,10 +180,10 @@ exports.putApiRecommendation = (req, res, next) => {
       }
     }, function (err) {
       if (!err) {
-        res.send('notification!');
+        res.status(200).send('notification!');
       }
       else {
-        res.send(err);
+        res.status(500).json(err);
       }
     });
   } else {
@@ -203,13 +203,12 @@ exports.deleteApiRecommendation = (req, res, next) => {
   if (req.user && id) {
     Recommendation.remove({ _id: id }, function (err) {
       if (!err) {
-        res.send('notification!');
+        res.status(200).send('notification!');
       }
       else {
-        res.send(err);
+        res.status(500).json(err);
       }
     });
-    //res.send("asdasdas");
   } else {
     res.render('account/login', {
       title: 'Login',

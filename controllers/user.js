@@ -58,17 +58,17 @@ exports.postApiLogin = (req, res, next) => {
 
   const errors = req.validationErrors();
   if (errors) {
-    return res.send('errors', errors);
+    return res.status(500).json(errors);
   }
 
   passport.authenticate('local', (err, user, info) => {
-    if (err) { return res.send('errors', err); }
+    if (err) { return res.status(500).json(err); }
     if (!user) {
-      return res.send('errors', info);
+      return res.status(500).json(info);
     }
     req.logIn(user, (err) => {
       if (err) { return res.status(500).json(err); }
-      return res.send('success', user);
+      return res.status(200).json(user);
     });
   })(req, res, next);
 };
@@ -90,7 +90,7 @@ exports.logout = (req, res) => {
  */
 exports.postApiLogout = (req, res) => {
   req.logout();
-  return res.send('success', { msg: 'Logout Success' });
+  return res.res.status(200).json({ msg: 'Logout Success' });
 };
 
 /**
@@ -160,7 +160,7 @@ exports.postApiSignup = (req, res, next) => {
   const errors = req.validationErrors();
 
   if (errors) {
-    return res.send('errors', errors);
+    return res.status(500).json(errors);
   }
 
   const user = new User({
@@ -172,16 +172,16 @@ exports.postApiSignup = (req, res, next) => {
 
   User.findOne({ email: req.body.email }, (err, existingUser) => {
     if (existingUser) {
-      return res.send('errors', { msg: 'Account with that email address already exists.' });
+      return res.status(500).json({ msg: 'Account with that email address already exists.' });
     }
     user.save((err) => {
-      if (err) { return res.send('errors', err); }
+      if (err) { return res.status(500).json(err); }
       req.logIn(user, (err) => {
         if (err) {
-          return res.send('errors', err);
+          return res.status(500).json(err);
         }
         user.password = '';
-        return res.send('success', user);
+        return res.status(200).json(user);
       });
     });
   });
@@ -244,11 +244,11 @@ exports.postApiUpdateProfile = (req, res, next) => {
   const errors = req.validationErrors();
 
   if (errors) {
-    return res.send('errors', errors);
+    return res.status(500).json(errors);
   }
 
   User.findById(req.user.id, (err, user) => {
-    if (err) { return res.send('errors', err); }
+    if (err) { return res.status(500).json(err); }
     user.email = req.body.email || '';
     user.profile.name = req.body.name || '';
     user.profile.gender = req.body.gender || '';
@@ -257,11 +257,11 @@ exports.postApiUpdateProfile = (req, res, next) => {
     user.save((err) => {
       if (err) {
         if (err.code === 11000) {
-          return res.send('errors', { msg: 'The email address you have entered is already associated with an account.' });
+          return res.status(500).json({ msg: 'The email address you have entered is already associated with an account.' });
         }
-        return res.send('errors', err);;
+        return res.status(500).json(err);;
       }
-      return res.send('success', user);
+      return res.status(200).json(user);
     });
   });
 };
@@ -301,15 +301,15 @@ exports.postApiUpdatePassword = (req, res, next) => {
   req.assert('confirmPassword', 'Passwords do not match').equals(req.body.password);
 
   if (errors) {
-    return res.send('errors', errors);
+    return res.status(500).json(errors);
   }
 
   User.findById(req.user.id, (err, user) => {
-    if (err) { return res.send('errors', err); }
+    if (err) { return res.status(500).json(err); }
     user.password = req.body.password;
     user.save((err) => {
-      if (err) { return res.send('errors', err); }
-      return res.send('success', { msg: 'Password has been changed.' });
+      if (err) { return res.status(500).json(err); }
+      return res.status(200).json({ msg: 'Password has been changed.' });
     });
   });
 };
@@ -352,12 +352,12 @@ exports.getOauthUnlink = (req, res, next) => {
 exports.getApiOauthUnlink = (req, res, next) => {
   const provider = req.params.provider;
   User.findById(req.user.id, (err, user) => {
-    if (err) { return res.send('errors', err); }
+    if (err) { return res.status(500).json(err); }
     user[provider] = undefined;
     user.tokens = user.tokens.filter(token => token.kind !== provider);
     user.save((err) => {
-      if (err) { return res.send('errors', err); }
-      return res.send('success', { msg: `${provider} account has been unlinked.` })
+      if (err) { return res.status(500).json(err); }
+      return res.status(200).json({ msg: `${provider} account has been unlinked.` })
     });
   });
 };
@@ -458,7 +458,7 @@ exports.postApiReset = (req, res, next) => {
   const errors = req.validationErrors();
 
   if (errors) {
-    return res.send('errors', errors);
+    return res.status(500).json(errors);
   }
 
   async.waterfall([
@@ -467,15 +467,15 @@ exports.postApiReset = (req, res, next) => {
         .findOne({ passwordResetToken: req.params.token })
         .where('passwordResetExpires').gt(Date.now())
         .exec((err, user) => {
-          if (err) { return res.send('errors', err); }
+          if (err) { return res.status(500).json(err); }
           if (!user) {
-            return res.send('errors', { msg: 'Password reset token is invalid or has expired.' });
+            return res.status(500).json({ msg: 'Password reset token is invalid or has expired.' });
           }
           user.password = req.body.password;
           user.passwordResetToken = undefined;
           user.passwordResetExpires = undefined;
           user.save((err) => {
-            if (err) { return res.send('errors', err) }
+            if (err) { return res.status(500).json(err) }
             req.logIn(user, (err) => {
               done(err, user);
             });
@@ -498,12 +498,12 @@ exports.postApiReset = (req, res, next) => {
       };
       transporter.sendMail(mailOptions, (err) => {
         done(err);
-        return res.send('success', { msg: 'Success! Your password has been changed.' })
+        return res.status(200).json({ msg: 'Success! Your password has been changed.' })
       });
     }
   ], (err) => {
-    if (err) { return res.send('errors', err) }
-    return res.send('success', { msg: 'Success! Your password has been changed.' })
+    if (err) { return res.status(500).json(err) }
+    return res.status(200).json({ msg: 'Success! Your password has been changed.' })
   });
 };
 
@@ -594,7 +594,7 @@ exports.postApiForgot = (req, res, next) => {
   const errors = req.validationErrors();
 
   if (errors) {
-    return res.send('errors', errors);
+    return res.status(500).json(errors);
   }
 
   async.waterfall([
@@ -607,7 +607,7 @@ exports.postApiForgot = (req, res, next) => {
     function (token, done) {
       User.findOne({ email: req.body.email }, (err, user) => {
         if (!user) {
-          return res.send('errors', { msg: 'Account with that email address does not exist.' });
+          return res.status(500).json({ msg: 'Account with that email address does not exist.' });
         }
         user.passwordResetToken = token;
         user.passwordResetExpires = Date.now() + 3600000; // 1 hour
@@ -635,11 +635,11 @@ exports.postApiForgot = (req, res, next) => {
       };
       transporter.sendMail(mailOptions, (err) => {
         done(err);
-        return res.send('success', { msg: `An e-mail has been sent to ${user.email} with further instructions.` });
+        return res.status(200).json({ msg: `An e-mail has been sent to ${user.email} with further instructions.` });
       });
     }
   ], (err) => {
-    if (err) { return res.send('errors', err) }
-    return res.send('success', { mss: '/forgot' });
+    if (err) { return res.status(500).json(err) }
+    return res.status(500).json({ msg: '/forgot' });
   });
 };

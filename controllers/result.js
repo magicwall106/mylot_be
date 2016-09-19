@@ -110,7 +110,7 @@ exports.putApiResult = (req, res, next) => {
   const errors = req.validationErrors();
   if (errors) {
     req.flash('errors', errors);
-    return res.send(JSON.stringify(errors));
+    return res.status(500).json(errors);
   }
   const id = req.body.id;
   if (req.user && id) {
@@ -135,10 +135,10 @@ exports.putApiResult = (req, res, next) => {
       }
     }, function (err) {
       if (!err) {
-        res.send('notification!');
+        res.status(200).send('notification!');
       }
       else {
-        res.send(err);
+        res.status(500).json(err);
       }
     });
   } else {
@@ -158,13 +158,12 @@ exports.deleteApiResult = (req, res, next) => {
   if (req.user && id) {
     Result.remove({ _id: id }, function (err) {
       if (!err) {
-        res.send('notification!');
+        res.status(200).send('notification!');
       }
       else {
-        res.send(err);
+        res.status(500).json(err);
       }
     });
-    //res.send("asdasdas");
   } else {
     res.render('account/login', {
       title: 'Login',
@@ -180,11 +179,9 @@ exports.deleteApiResult = (req, res, next) => {
 exports.getApiResult = (req, res) => {
   Result.find({}, function (err, data) {
     if (err) {
-      res.render('error', {
-        status: 500
-      });
+      res.status(500).json(err);
     } else {
-      res.jsonp(data);
+      res.status(200).json(data);
     }
   });
 };
