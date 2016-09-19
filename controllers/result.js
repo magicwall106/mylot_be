@@ -31,7 +31,7 @@ exports.getAddResult = (req, res) => {
 
 /**
  * POST /result
- * Add single||multiple results.
+ * API Add single||multiple results.
  */
 
 exports.postApiResult = (req, res, next) => {

@@ -26,7 +26,7 @@ passport.use(new LocalStrategy({ usernameField: 'email' }, (email, password, don
     }
     user.comparePassword(password, (err, isMatch) => {
       if (isMatch) {
-        user.password ='';
+        user.password = '';
         return done(null, user);
       }
       return done(null, false, { msg: 'Invalid email or password.' });
@@ -184,7 +184,10 @@ exports.isApiAuthenticated = (req, res, next) => {
   if (req.isAuthenticated()) {
     return next();
   }
-  return res.send('errors', {msg: 'Is not Authenticated'});
+  return res.send('errors', {
+    msg: 'Is not Authenticated',
+    status: 500
+  });
 };
 
 /**
