@@ -234,6 +234,17 @@ exports.postUpdateProfile = (req, res, next) => {
 };
 
 /**
+ * Get /api/account/profile
+ * API get profile information.
+ */
+exports.getApiProfile = (req, res, next) => {
+  User.findById(req.user.id, (err, user) => {
+    if (err) { return res.status(500).json(err); }
+    return res.status(200).json(user);
+  });
+};
+
+/**
  * POST /api/account/profile
  * API Update profile information.
  */

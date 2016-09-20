@@ -98,17 +98,24 @@ app.use((req, res, next) => {
   res.locals.user = req.user;
   next();
 });
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   // After successful login, redirect back to the intended page
   if (!req.user &&
-      req.path !== '/login' &&
-      req.path !== '/signup' &&
-      !req.path.match(/^\/auth/) &&
-      !req.path.match(/\./)) {
+    req.path !== '/login' &&
+    req.path !== '/signup' &&
+    !req.path.match(/^\/auth/) &&
+    !req.path.match(/\./)) {
     req.session.returnTo = req.path;
   }
   next();
 });
+
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
 
 /**
@@ -143,6 +150,7 @@ app.get('/lottery/add', passportConfig.isAuthenticated, lotteryController.getAdd
 app.post('/api/login', userController.postApiLogin);
 app.post('/api/logout', userController.postApiLogout);
 app.post('/api/signup', userController.postApiSignup);
+app.get('/api/account/profile', passportConfig.isApiAuthenticated, userController.getApiProfile);
 app.post('/api/account/profile', passportConfig.isApiAuthenticated, userController.postApiUpdateProfile);
 app.post('/api/account/password', passportConfig.isApiAuthenticated, userController.postApiUpdatePassword);
 app.get('/api/account/unlink/:provider', passportConfig.isApiAuthenticated, userController.getApiOauthUnlink);
@@ -207,11 +215,11 @@ app.use(errorHandler());
  * Start Express server.
  */
 var IP_ADDRESS = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
-var PORT = process.env.OPENSHIFT_NODEJS_PORT || 8080;
+var PORT = process.env.OPENSHIFT_NODEJS_PORT || 3000;
 /*app.listen(app.get('port'), () => {
   console.log('%s Express server listening on port %d in %s mode.', chalk.green('✓'), app.get('port'), app.get('env'));
 });*/
-app.listen(PORT, IP_ADDRESS, function() {
+app.listen(PORT, IP_ADDRESS, function () {
   console.log("Express server listening on port %d in %s mode", PORT, app.settings.env);
 });
 
