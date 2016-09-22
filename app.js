@@ -80,7 +80,8 @@ app.use(session({
   store: new MongoStore({
     url: process.env.MONGODB_URI || process.env.MONGOLAB_URI,
     autoReconnect: true
-  })
+  }),
+  cookie: { httpOnly: false }
 }));
 app.use(passport.initialize());
 app.use(passport.session());
