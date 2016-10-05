@@ -68,7 +68,7 @@ exports.postApiLogin = (req, res, next) => {
     }
     req.logIn(user, (err) => {
       if (err) { return res.status(500).json(err); }
-      return res.status(200).json(user);
+      return res.status(200).json({msg: 'Logged in succesfully'});
     });
   })(req, res, next);
 };
@@ -88,7 +88,7 @@ exports.logout = (req, res) => {
  * GET /api/logout
  * API Log out.
  */
-exports.postApiLogout = (req, res) => {
+exports.getApiLogout = (req, res) => {
   req.logout();
   return res.status(200).json({ msg: 'Logout Success' });
 };
@@ -240,6 +240,7 @@ exports.postUpdateProfile = (req, res, next) => {
 exports.getApiProfile = (req, res, next) => {
   User.findById(req.user.id, (err, user) => {
     if (err) { return res.status(500).json(err); }
+    user.password='';
     return res.status(200).json(user);
   });
 };

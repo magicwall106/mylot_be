@@ -111,9 +111,15 @@ app.use(function (req, res, next) {
 });
 
 app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
+  var allowedOrigins = ['http://localhost:3000', 'http://localhost:8080', 'http://mylot-expressapp.rhcloud.com','http://129.vn/mylot.html'];
+  var origin = req.headers.origin;
+  if(allowedOrigins.indexOf(origin) > -1){
+       res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+
+  //res.header("Access-Control-Allow-Origin", "http://localhost:8080");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  //res.header("Access-Control-Allow-Credentials",true);
+  res.header("Access-Control-Allow-Credentials",true);
   res.header("Allow","GET, HEAD, POST, PUT, DELETE");
   next();
 });
@@ -150,7 +156,7 @@ app.get('/lottery/add', passportConfig.isAuthenticated, lotteryController.getAdd
 
 /*USER API****************/
 app.post('/api/login', userController.postApiLogin);
-app.post('/api/logout', userController.postApiLogout);
+app.get('/api/logout', userController.getApiLogout);
 app.post('/api/signup', userController.postApiSignup);
 app.get('/api/account/profile', passportConfig.isApiAuthenticated, userController.getApiProfile);
 app.post('/api/account/profile', passportConfig.isApiAuthenticated, userController.postApiUpdateProfile);
