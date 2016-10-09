@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema({
   password: String,
   passwordResetToken: String,
   passwordResetExpires: Date,
+  active: Boolean,
 
   facebook: String,
   twitter: String,
@@ -22,8 +23,12 @@ const userSchema = new mongoose.Schema({
   realAwards: [{ type: mongoose.Schema.Types.ObjectId, ref: "Lottery" }],
   tryAwards: [{ type: mongoose.Schema.Types.ObjectId, ref: "Recommendation" }],
   profile: {
-    name: String,
+    firstname: String,
+    lastname: String,
     gender: String,
+    dob: Date,
+    address: String,
+    city: String,
     location: String,
     website: String,
     picture: String

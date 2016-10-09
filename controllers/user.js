@@ -172,13 +172,13 @@ exports.postApiSignup = (req, res, next) => {
 
   User.findOne({ email: req.body.email }, (err, existingUser) => {
     if (existingUser) {
-      return res.status(500).json({ msg: 'Account with that email address already exists.' });
+      return res.status(400).json({ msg: 'Account with that email address already exists.' });
     }
     user.save((err) => {
-      if (err) { return res.status(500).json(err); }
+      if (err) { return res.status(400).json(err); }
       req.logIn(user, (err) => {
         if (err) {
-          return res.status(500).json(err);
+          return res.status(400).json(err);
         }
         user.password = '';
         return res.status(200).json(user);
@@ -256,22 +256,26 @@ exports.postApiUpdateProfile = (req, res, next) => {
   const errors = req.validationErrors();
 
   if (errors) {
-    return res.status(500).json(errors);
+    return res.status(400).json(errors);
   }
 
   User.findById(req.user.id, (err, user) => {
-    if (err) { return res.status(500).json(err); }
+    if (err) { return res.status(400).json(err); }
     user.email = req.body.email || '';
-    user.profile.name = req.body.name || '';
-    user.profile.gender = req.body.gender || '';
-    user.profile.location = req.body.location || '';
-    user.profile.website = req.body.website || '';
+    user.phone = req.body.phone || '';
+    user.profile.dob = req.body.profile.dob || '';
+    user.profile.firstname = req.body.profile.firstname || '';
+    user.profile.lastname = req.body.profile.lastname || '';
+    user.profile.gender = req.body.profile.gender || '';
+    user.profile.address = req.body.profile.address || '';
+    user.profile.city = req.body.profile.city || '';
+    user.profile.website = req.body.profile.website || '';
     user.save((err) => {
       if (err) {
         if (err.code === 11000) {
-          return res.status(500).json({ msg: 'The email address you have entered is already associated with an account.' });
+          return res.status(400).json({ msg: 'The email address you have entered is already associated with an account.' });
         }
-        return res.status(500).json(err);;
+        return res.status(400).json(err);;
       }
       return res.status(200).json(user);
     });
