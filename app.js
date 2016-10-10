@@ -162,6 +162,7 @@ app.get('/api/account/profile', passportConfig.isApiAuthenticated, userControlle
 app.post('/api/account/profile', passportConfig.isApiAuthenticated, userController.postApiUpdateProfile);
 app.post('/api/account/password', passportConfig.isApiAuthenticated, userController.postApiUpdatePassword);
 app.get('/api/account/unlink/:provider', passportConfig.isApiAuthenticated, userController.getApiOauthUnlink);
+app.get('/api/account/activate', userController.getApiActive);
 app.get('/api/reset/:token', userController.postApiReset);
 app.post('/api/forgot', userController.postApiForgot);
 

@@ -68,7 +68,7 @@ exports.postApiLogin = (req, res, next) => {
     }
     req.logIn(user, (err) => {
       if (err) { return res.status(500).json(err); }
-      return res.status(200).json({msg: 'Logged in succesfully'});
+      return res.status(200).json({ msg: 'Logged in succesfully'});
     });
   })(req, res, next);
 };
@@ -170,20 +170,50 @@ exports.postApiSignup = (req, res, next) => {
     role: process.env.ROLE_USER
   });
 
-  User.findOne({ email: req.body.email }, (err, existingUser) => {
-    if (existingUser) {
-      return res.status(400).json({ msg: 'Account with that email address already exists.' });
-    }
-    user.save((err) => {
-      if (err) { return res.status(400).json(err); }
-      req.logIn(user, (err) => {
-        if (err) {
-          return res.status(400).json(err);
+  async.waterfall([
+    function (done) {
+      crypto.randomBytes(16, (err, buf) => {
+        const token = buf.toString('hex');
+        done(err, token);
+      });
+    },
+    function (token, done) {
+      User.findOne({ email: req.body.email }, (err, existingUser) => {
+        if (existingUser) {
+          return res.status(400).json({ msg: 'Account with that email address already exists.' });
         }
-        user.password = '';
+        user.activeKey = token;
+        user.active = false;
+        user.save((err) => {
+          done(err, token, user);
+        });
+      });
+    },
+    function (token, user, done) {
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: process.env.GMAIL_USERID,
+          pass: process.env.GMAIL_PASSWORD
+        }
+      });
+      const mailOptions = {
+        to: user.email,
+        from: 'mylot@starter.com',
+        subject: 'Activate your account on Mylot',
+        text: `You are receiving this email because you (or someone else) have requested the reset of the password for your account.\n\n
+          Please click on the following link, or paste this into your browser to complete the process:\n\n
+          http://${req.headers.host}/api/active/${token}\n\n
+          If you did not request this, please ignore this email and your password will remain unchanged.\n`
+      };
+      transporter.sendMail(mailOptions, (err) => {
+        done(err);
         return res.status(200).json(user);
       });
-    });
+    }
+  ], (err) => {
+    if (err) { return res.status(500).json(err) }
+    //return res.status(500).json({ msg: '/login' });
   });
 };
 
@@ -240,7 +270,7 @@ exports.postUpdateProfile = (req, res, next) => {
 exports.getApiProfile = (req, res, next) => {
   User.findById(req.user.id, (err, user) => {
     if (err) { return res.status(500).json(err); }
-    user.password='';
+    user.password = '';
     return res.status(200).json(user);
   });
 };
@@ -519,7 +549,7 @@ exports.postApiReset = (req, res, next) => {
     }
   ], (err) => {
     if (err) { return res.status(500).json(err) }
-    return res.status(200).json({ msg: 'Success! Your password has been changed.' })
+    //return res.status(200).json({ msg: 'Success! Your password has been changed.' })
   });
 };
 
@@ -659,3 +689,23 @@ exports.postApiForgot = (req, res, next) => {
     return res.status(500).json({ msg: '/forgot' });
   });
 };
+
+exports.getApiActive = (req, res, next) => {
+  const activeKey = req.query.key;
+  console.log("Activate key: " + activeKey);
+  User.findOne({ activeKey: activeKey }, (err, user) => {
+    if (err) { return res.status(400).json(err) }
+    if(!user){
+      return res.status(400).json({msg: 'Activate key does not exist.'});
+    }
+    if(user.active === true){
+      return res.status(400).json({msg: 'Account has been active'});
+    }
+    user.active = true;
+    user.save((err) => {
+      if (err) { return res.status(500).json(err) }
+      return res.status(200).json(user);
+    });
+  });
+
+}
