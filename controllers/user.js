@@ -3,6 +3,8 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const passport = require('passport');
 const User = require('../models/User');
+
+const queryField= 'email profile active google facebook realAwards tryAwards role';
 /**
  * GET /login
  * Login page.
@@ -203,12 +205,14 @@ exports.postApiSignup = (req, res, next) => {
         subject: 'Activate your account on Mylot',
         text: `You are receiving this email because you (or someone else) have requested the reset of the password for your account.\n\n
           Please click on the following link, or paste this into your browser to complete the process:\n\n
-          http://${req.headers.host}/api/active/${token}\n\n
+          http://${req.headers.host}/api/account/activate?key=${token}\n\n
           If you did not request this, please ignore this email and your password will remain unchanged.\n`
       };
       transporter.sendMail(mailOptions, (err) => {
         done(err);
-        return res.status(200).json(user);
+        User.findById(user._id, queryField, (err, account)=>{
+          return res.status(200).json(account);
+        });
       });
     }
   ], (err) => {
@@ -268,9 +272,8 @@ exports.postUpdateProfile = (req, res, next) => {
  * API get profile information.
  */
 exports.getApiProfile = (req, res, next) => {
-  User.findById(req.user.id, (err, user) => {
+  User.findById(req.user.id, queryField, (err, user) => {
     if (err) { return res.status(500).json(err); }
-    user.password = '';
     return res.status(200).json(user);
   });
 };
@@ -343,18 +346,19 @@ exports.postUpdatePassword = (req, res, next) => {
  * API Update current password.
  */
 exports.postApiUpdatePassword = (req, res, next) => {
-  req.assert('password', 'Password must be at least 4 characters long').len(4);
-  req.assert('confirmPassword', 'Passwords do not match').equals(req.body.password);
+  req.assert('newPassword', 'Password must be at least 4 characters long').len(4);
+  req.assert('confirmPassword', 'Passwords do not match').equals(req.body.newPassword);
 
+  const errors = req.validationErrors();
   if (errors) {
-    return res.status(500).json(errors);
+    return res.status(400).json(errors);
   }
 
   User.findById(req.user.id, (err, user) => {
-    if (err) { return res.status(500).json(err); }
-    user.password = req.body.password;
+    if (err) { return res.status(400).json(err); }
+    user.password = req.body.newPassword;
     user.save((err) => {
-      if (err) { return res.status(500).json(err); }
+      if (err) { return res.status(400).json(err); }
       return res.status(200).json({ msg: 'Password has been changed.' });
     });
   });
@@ -693,7 +697,7 @@ exports.postApiForgot = (req, res, next) => {
 exports.getApiActive = (req, res, next) => {
   const activeKey = req.query.key;
   console.log("Activate key: " + activeKey);
-  User.findOne({ activeKey: activeKey }, (err, user) => {
+  User.findOne({ activeKey: activeKey }, queryField, (err, user) => {
     if (err) { return res.status(400).json(err) }
     if(!user){
       return res.status(400).json({msg: 'Activate key does not exist.'});
