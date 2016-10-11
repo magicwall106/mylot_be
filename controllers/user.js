@@ -4,7 +4,7 @@ const nodemailer = require('nodemailer');
 const passport = require('passport');
 const User = require('../models/User');
 
-const queryField= 'email profile active google facebook realAwards tryAwards role';
+const queryField = 'email profile active google facebook realAwards tryAwards role';
 /**
  * GET /login
  * Login page.
@@ -60,17 +60,17 @@ exports.postApiLogin = (req, res, next) => {
 
   const errors = req.validationErrors();
   if (errors) {
-    return res.status(500).json(errors);
+    return res.status(400).json(errors);
   }
 
   passport.authenticate('local', (err, user, info) => {
-    if (err) { return res.status(500).json(err); }
+    if (err) { return res.status(400).json(err); }
     if (!user) {
-      return res.status(500).json(info);
+      return res.status(400).json(info);
     }
     req.logIn(user, (err) => {
-      if (err) { return res.status(500).json(err); }
-      return res.status(200).json({ msg: 'Logged in succesfully'});
+      if (err) { return res.status(400).json(err); }
+      return res.status(200).json({ msg: 'Logged in succesfully' });
     });
   })(req, res, next);
 };
@@ -162,7 +162,7 @@ exports.postApiSignup = (req, res, next) => {
   const errors = req.validationErrors();
 
   if (errors) {
-    return res.status(500).json(errors);
+    return res.status(400).json(errors);
   }
 
   const user = new User({
@@ -205,19 +205,19 @@ exports.postApiSignup = (req, res, next) => {
         subject: 'Activate your account on Mylot',
         text: `You are receiving this email because you (or someone else) have requested the reset of the password for your account.\n\n
           Please click on the following link, or paste this into your browser to complete the process:\n\n
-          http://${req.headers.host}/api/account/activate?key=${token}\n\n
+          ${req.headers.referer}#/activate?key=${token}\n\n 
           If you did not request this, please ignore this email and your password will remain unchanged.\n`
       };
       transporter.sendMail(mailOptions, (err) => {
         done(err);
-        User.findById(user._id, queryField, (err, account)=>{
+        User.findById(user._id, queryField, (err, account) => {
           return res.status(200).json(account);
         });
       });
     }
   ], (err) => {
-    if (err) { return res.status(500).json(err) }
-    //return res.status(500).json({ msg: '/login' });
+    if (err) { return res.status(400).json(err) }
+    //return res.status(400).json({ msg: '/login' });
   });
 };
 
@@ -273,7 +273,7 @@ exports.postUpdateProfile = (req, res, next) => {
  */
 exports.getApiProfile = (req, res, next) => {
   User.findById(req.user.id, queryField, (err, user) => {
-    if (err) { return res.status(500).json(err); }
+    if (err) { return res.status(400).json(err); }
     return res.status(200).json(user);
   });
 };
@@ -402,11 +402,11 @@ exports.getOauthUnlink = (req, res, next) => {
 exports.getApiOauthUnlink = (req, res, next) => {
   const provider = req.params.provider;
   User.findById(req.user.id, (err, user) => {
-    if (err) { return res.status(500).json(err); }
+    if (err) { return res.status(400).json(err); }
     user[provider] = undefined;
     user.tokens = user.tokens.filter(token => token.kind !== provider);
     user.save((err) => {
-      if (err) { return res.status(500).json(err); }
+      if (err) { return res.status(400).json(err); }
       return res.status(200).json({ msg: `${provider} account has been unlinked.` })
     });
   });
@@ -498,7 +498,27 @@ exports.postReset = (req, res, next) => {
 };
 
 /**
- * POST /api/reset/:token
+ * GET /api/reset/init?token=xxx
+ * API Reset Password page.
+ */
+exports.getApiReset = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    return res.status(400).json({ msg: 'Account is logged by someone' });
+  }
+  User
+    .findOne({ passwordResetToken: req.query.token })
+    .where('passwordResetExpires').gt(Date.now())
+    .exec((err, user) => {
+      if (err) { return res.status(400).json({ msg: 'Something went wrong' }) }
+      if (!user) {
+        return res.status(400).json({ msg: 'Password reset token is invalid or has expired.' });
+      }
+      return res.status(200).json({ msg: 'Process setting new password' });
+    });
+};
+
+/**
+ * POST /api/reset/finish
  * API Process the reset password request.
  */
 exports.postApiReset = (req, res, next) => {
@@ -508,24 +528,24 @@ exports.postApiReset = (req, res, next) => {
   const errors = req.validationErrors();
 
   if (errors) {
-    return res.status(500).json(errors);
+    return res.status(400).json(errors);
   }
 
   async.waterfall([
     function (done) {
       User
-        .findOne({ passwordResetToken: req.params.token })
+        .findOne({ passwordResetToken: req.body.key })
         .where('passwordResetExpires').gt(Date.now())
         .exec((err, user) => {
-          if (err) { return res.status(500).json(err); }
+          if (err) { return res.status(400).json(err); }
           if (!user) {
-            return res.status(500).json({ msg: 'Password reset token is invalid or has expired.' });
+            return res.status(400).json({ msg: 'Password reset token is invalid or has expired.' });
           }
           user.password = req.body.password;
           user.passwordResetToken = undefined;
           user.passwordResetExpires = undefined;
           user.save((err) => {
-            if (err) { return res.status(500).json(err) }
+            if (err) { return res.status(400).json(err) }
             req.logIn(user, (err) => {
               done(err, user);
             });
@@ -552,8 +572,7 @@ exports.postApiReset = (req, res, next) => {
       });
     }
   ], (err) => {
-    if (err) { return res.status(500).json(err) }
-    //return res.status(200).json({ msg: 'Success! Your password has been changed.' })
+    if (err) { return res.status(400).json(err) }
   });
 };
 
@@ -619,7 +638,7 @@ exports.postForgot = (req, res, next) => {
         subject: 'Reset your password on Hackathon Starter',
         text: `You are receiving this email because you (or someone else) have requested the reset of the password for your account.\n\n
           Please click on the following link, or paste this into your browser to complete the process:\n\n
-          http://${req.headers.host}/reset/${token}\n\n
+          ${req.headers.referer}reset/${token}\n\n
           If you did not request this, please ignore this email and your password will remain unchanged.\n`
       };
       transporter.sendMail(mailOptions, (err) => {
@@ -644,7 +663,7 @@ exports.postApiForgot = (req, res, next) => {
   const errors = req.validationErrors();
 
   if (errors) {
-    return res.status(500).json(errors);
+    return res.status(400).json(errors);
   }
 
   async.waterfall([
@@ -657,7 +676,7 @@ exports.postApiForgot = (req, res, next) => {
     function (token, done) {
       User.findOne({ email: req.body.email }, (err, user) => {
         if (!user) {
-          return res.status(500).json({ msg: 'Account with that email address does not exist.' });
+          return res.status(400).json({ msg: 'Account with that email address does not exist.' });
         }
         user.passwordResetToken = token;
         user.passwordResetExpires = Date.now() + 3600000; // 1 hour
@@ -680,7 +699,7 @@ exports.postApiForgot = (req, res, next) => {
         subject: 'Reset your password on Hackathon Starter',
         text: `You are receiving this email because you (or someone else) have requested the reset of the password for your account.\n\n
           Please click on the following link, or paste this into your browser to complete the process:\n\n
-          http://${req.headers.host}/reset/${token}\n\n
+          ${req.headers.referer}#/reset/finish?key=${token}\n\n
           If you did not request this, please ignore this email and your password will remain unchanged.\n`
       };
       transporter.sendMail(mailOptions, (err) => {
@@ -689,25 +708,24 @@ exports.postApiForgot = (req, res, next) => {
       });
     }
   ], (err) => {
-    if (err) { return res.status(500).json(err) }
-    return res.status(500).json({ msg: '/forgot' });
+    if (err) { return res.status(400).json(err) }
+    //return res.status(400).json({ msg: '/forgot' });
   });
 };
 
 exports.getApiActive = (req, res, next) => {
   const activeKey = req.query.key;
-  console.log("Activate key: " + activeKey);
   User.findOne({ activeKey: activeKey }, queryField, (err, user) => {
     if (err) { return res.status(400).json(err) }
-    if(!user){
-      return res.status(400).json({msg: 'Activate key does not exist.'});
+    if (!user) {
+      return res.status(400).json({ msg: 'Activate key does not exist.' });
     }
-    if(user.active === true){
-      return res.status(400).json({msg: 'Account has been active'});
+    if (user.active === true) {
+      return res.status(400).json({ msg: 'Account has been active' });
     }
     user.active = true;
     user.save((err) => {
-      if (err) { return res.status(500).json(err) }
+      if (err) { return res.status(400).json(err) }
       return res.status(200).json(user);
     });
   });
