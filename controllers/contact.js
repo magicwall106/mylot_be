@@ -62,19 +62,19 @@ exports.postApiContact = (req, res) => {
   const errors = req.validationErrors();
 
   if (errors) {
-    return res.status(500).json(errors);
+    return res.status(400).json(errors);
   }
 
-  const mailOptions = {
-    to: 'your@email.com',
+    const mailOptions = {
+    to: process.env.GMAIL_USERID,
     from: `${req.body.name} <${req.body.email}>`,
-    subject: 'Contact Form | Hackathon Starter',
+    subject: 'Contact Form | Mylot Contact',
     text: req.body.message
   };
 
   transporter.sendMail(mailOptions, (err) => {
     if (err) {
-      return res.send('errors', { msg: err.message });
+      return res.status(400).json({ msg: err.message });
     }
     res.status(200).json({ msg: 'Email has been sent successfully!' });
   });
