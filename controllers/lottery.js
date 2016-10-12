@@ -120,7 +120,7 @@ exports.postApiLottery = (req, res, next) => {
 };
 
 /**
- * PUT /lottery
+ * PUT api/lottery
  * Update Lottery.
  */
 exports.putApiLottery = (req, res, next) => {
@@ -142,7 +142,7 @@ exports.putApiLottery = (req, res, next) => {
   const errors = req.validationErrors();
   if (errors) {
     req.flash('errors', errors);
-    return res.status(500).json(errors);
+    return res.status(401).json(errors);
   }
   const id = req.body.id;
   if (req.user && id) {

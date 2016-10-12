@@ -51,7 +51,7 @@ exports.postContact = (req, res) => {
 };
 
 /**
- * POST /contact
+ * POST /api/contact
  * API Send a contact form via Nodemailer.
  */
 exports.postApiContact = (req, res) => {
@@ -62,7 +62,7 @@ exports.postApiContact = (req, res) => {
   const errors = req.validationErrors();
 
   if (errors) {
-    return res.status(400).json(errors);
+    return res.status(401).json(errors);
   }
 
     const mailOptions = {

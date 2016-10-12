@@ -60,7 +60,7 @@ exports.postApiLogin = (req, res, next) => {
 
   const errors = req.validationErrors();
   if (errors) {
-    return res.status(400).json(errors);
+    return res.status(401).json(errors);
   }
 
   passport.authenticate('local', (err, user, info) => {
@@ -162,7 +162,7 @@ exports.postApiSignup = (req, res, next) => {
   const errors = req.validationErrors();
 
   if (errors) {
-    return res.status(400).json(errors);
+    return res.status(401).json(errors);
   }
 
   const user = new User({
@@ -289,7 +289,7 @@ exports.postApiUpdateProfile = (req, res, next) => {
   const errors = req.validationErrors();
 
   if (errors) {
-    return res.status(400).json(errors);
+    return res.status(401).json(errors);
   }
 
   User.findById(req.user.id, (err, user) => {
@@ -351,7 +351,7 @@ exports.postApiUpdatePassword = (req, res, next) => {
 
   const errors = req.validationErrors();
   if (errors) {
-    return res.status(400).json(errors);
+    return res.status(401).json(errors);
   }
 
   User.findById(req.user.id, (err, user) => {
@@ -528,7 +528,7 @@ exports.postApiReset = (req, res, next) => {
   const errors = req.validationErrors();
 
   if (errors) {
-    return res.status(400).json(errors);
+    return res.status(401).json(errors);
   }
 
   async.waterfall([
@@ -663,7 +663,7 @@ exports.postApiForgot = (req, res, next) => {
   const errors = req.validationErrors();
 
   if (errors) {
-    return res.status(400).json(errors);
+    return res.status(401).json(errors);
   }
 
   async.waterfall([
