@@ -35,6 +35,7 @@ const contactController = require('./controllers/contact');
 const resultController = require('./controllers/result');
 const recommendationController = require('./controllers/recommendation');
 const lotteryController = require('./controllers/lottery');
+const socialController = require('./controllers/social');
 /**
  * API keys and Passport configuration.
  */
@@ -215,6 +216,9 @@ app.get('/auth/google', passport.authenticate('google', { scope: 'profile email'
 app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/login' }), (req, res) => {
   res.redirect(req.session.returnTo || '/');
 });
+
+
+app.post('/api/auth/facebook', socialController.postApiAuthFacebook);
 
 /**
  * Error Handler.
