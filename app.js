@@ -216,9 +216,17 @@ app.get('/auth/google', passport.authenticate('google', { scope: 'profile email'
 app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/login' }), (req, res) => {
   res.redirect(req.session.returnTo || '/');
 });
+app.post('/api/auth/facebook/token', passport.authenticate('facebook-token'),
+  function (req, res) {
+    // do something with req.user
+    res.send(req.user);
+  }
+);
+
 
 
 app.post('/api/auth/facebook', socialController.postApiAuthFacebook);
+app.post('/api/auth/provider', socialController.postAuthSocial);
 
 /**
  * Error Handler.
