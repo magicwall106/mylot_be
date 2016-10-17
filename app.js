@@ -218,12 +218,9 @@ app.get('/auth/google/callback', passport.authenticate('google', { failureRedire
 });
 app.post('/api/auth/facebook/token', passport.authenticate('facebook-token'),
   function (req, res) {
-    // do something with req.user
-    res.send(req.user);
+    res.status(200).json(req.user);
   }
 );
-
-
 
 app.post('/api/auth/facebook', socialController.postApiAuthFacebook);
 app.post('/api/auth/provider', socialController.postAuthSocial);
