@@ -24,6 +24,7 @@ const userSchema = new mongoose.Schema({
   realAwards: [{ type: mongoose.Schema.Types.ObjectId, ref: "Lottery" }],
   tryAwards: [{ type: mongoose.Schema.Types.ObjectId, ref: "Recommendation" }],
   profile: {
+    name: {type: String, default: ''},
     firstname: {type: String, default: ''},
     lastname: {type: String, default: ''},
     gender: String,

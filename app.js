@@ -74,15 +74,19 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(expressValidator());
-app.use(session({
-  resave: true,
-  saveUninitialized: true,
+
+var sessionOption = {
+  name: 'mylot.sid',
+  resave: false,
+  saveUninitialized: false,
   secret: process.env.SESSION_SECRET,
   store: new MongoStore({
     url: process.env.MONGODB_URI || process.env.MONGOLAB_URI,
     autoReconnect: true
   })
-}));
+}; 
+var sessionMiddleware = session( sessionOption );
+app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
