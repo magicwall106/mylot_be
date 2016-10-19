@@ -18,7 +18,8 @@ const resultSchema = new mongoose.Schema({
     award2: Number,
     award3: Number,
     award4: Number
-  }
+  },
+  rates: Array
 }, { timestamps: true });
 resultSchema.plugin(mongoosePaginate);
 /**

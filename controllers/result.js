@@ -176,14 +176,14 @@ exports.deleteApiResult = (req, res, next) => {
  * Result Json: Get all results
  */
 exports.getApiResult = (req, res) => {
-  const limit = Math.max(10, req.query.limit || 0);
-  const page = Math.max(0, req.query.page || 0);
-  const sort = {resultDate: 'desc'};
-  Result.paginate({}, { offset: limit * page, limit: limit, sort: sort }, function(err, result) {
+  const limit = Math.max(1, +req.query.limit || 0);
+  const page = Math.max(0, +req.query.page - 1 || 0);
+  const sort = { resultDate: 'desc' };
+  Result.paginate({}, { offset: limit * page, limit: limit, sort: sort }, function (err, result) {
     if (err) {
-        res.status(500).json(err);
-      } else {
-        res.status(200).json(result);
-      }
+      res.status(500).json(err);
+    } else {
+      res.status(200).json(result);
+    }
   });
 };
