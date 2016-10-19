@@ -10,7 +10,7 @@ exports.getRecommendation = (req, res) => {
   Recommendation.find(paramSearch, function (err, data) {
     if (err) {
       res.render('error', {
-        status: 500
+        status: 400
       });
     } else {
       res.render('recommendation/index', {
@@ -43,7 +43,7 @@ exports.getApiRecommendation = (req, res) => {
   const sort = {updatedAt: 'desc'};
   Recommendation.paginate(paramSearch, { offset: limit * page, limit: limit, sort: sort }, function(err, result) {
     if (err) {
-        res.status(500).json(err);
+        res.status(400).json(err);
       } else {
         res.status(200).json(result);
       }
@@ -144,7 +144,7 @@ exports.putApiRecommendation = (req, res, next) => {
   const errors = req.validationErrors();
   if (errors) {
     req.flash('errors', errors);
-    return res.status(500).json(errors);
+    return res.status(400).json(errors);
   }
   const id = req.body.id;
   if (req.user && id) {
@@ -185,7 +185,7 @@ exports.putApiRecommendation = (req, res, next) => {
         res.status(200).send('notification!');
       }
       else {
-        res.status(500).json(err);
+        res.status(400).json(err);
       }
     });
   } else {
@@ -208,7 +208,7 @@ exports.deleteApiRecommendation = (req, res, next) => {
         res.status(200).send('notification!');
       }
       else {
-        res.status(500).json(err);
+        res.status(400).json(err);
       }
     });
   } else {

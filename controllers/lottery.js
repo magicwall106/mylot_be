@@ -9,7 +9,7 @@ exports.getLottery = (req, res) => {
   Lottery.find(paramSearch, function (err, data) {
     if (err) {
       res.render('error', {
-        status: 500
+        status: 400
       });
     } else {
       res.render('lottery/index', {
@@ -41,7 +41,7 @@ exports.getApiLottery = (req, res) => {
   const sort = {updatedAt: 'desc'};
   Lottery.paginate(paramSearch, { offset: limit * page, limit: limit, sort: sort }, function(err, result) {
     if (err) {
-        res.status(500).json(err);
+        res.status(400).json(err);
       } else {
         res.status(200).json(result);
       }
@@ -183,7 +183,7 @@ exports.putApiLottery = (req, res, next) => {
         res.status(200).send('notification!');
       }
       else {
-        res.status(500).json(err);
+        res.status(400).json(err);
       }
     });
   } else {
@@ -206,7 +206,7 @@ exports.deleteApiLottery = (req, res, next) => {
         res.status(200).send('notification!');
       }
       else {
-        res.status(500).json(err);
+        res.status(400).json(err);
       }
     });
   } else {

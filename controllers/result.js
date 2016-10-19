@@ -7,7 +7,7 @@ exports.getResult = (req, res) => {
   Result.find().exec(function (err, data) {
     if (err) {
       res.render('error', {
-        status: 500
+        status: 400
       });
     } else {
       res.render('result/index', {
@@ -109,7 +109,7 @@ exports.putApiResult = (req, res, next) => {
   const errors = req.validationErrors();
   if (errors) {
     req.flash('errors', errors);
-    return res.status(500).json(errors);
+    return res.status(400).json(errors);
   }
   const id = req.body.id;
   if (req.user && id) {
@@ -137,7 +137,7 @@ exports.putApiResult = (req, res, next) => {
         res.status(200).send('notification!');
       }
       else {
-        res.status(500).json(err);
+        res.status(400).json(err);
       }
     });
   } else {
@@ -160,7 +160,7 @@ exports.deleteApiResult = (req, res, next) => {
         res.status(200).send('notification!');
       }
       else {
-        res.status(500).json(err);
+        res.status(400).json(err);
       }
     });
   } else {
@@ -181,7 +181,7 @@ exports.getApiResult = (req, res) => {
   const sort = { resultDate: 'desc' };
   Result.paginate({}, { offset: limit * page, limit: limit, sort: sort }, function (err, result) {
     if (err) {
-      res.status(500).json(err);
+      res.status(400).json(err);
     } else {
       res.status(200).json(result);
     }

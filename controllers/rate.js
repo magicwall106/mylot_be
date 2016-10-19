@@ -56,7 +56,7 @@ exports.putApiRate = (req, res, next) => {
 
   const errors = req.validationErrors();
   if (errors) {
-    return res.status(500).json(errors);
+    return res.status(400).json(errors);
   }
   const id = req.body.id;
   if (req.user && id) {
@@ -70,7 +70,7 @@ exports.putApiRate = (req, res, next) => {
         res.status(200).send('updated!');
       }
       else {
-        res.status(500).json(err);
+        res.status(400).json(err);
       }
     });
   } else {
@@ -93,11 +93,11 @@ exports.deleteApiRate = (req, res, next) => {
         res.status(200).send('deleted!');
       }
       else {
-        res.status(500).json(err);
+        res.status(400).json(err);
       }
     });
   } else {
-    res.status(500).json({
+    res.status(400).json({
       title: 'Login',
       msg: "Login first! You don't have permission to access this URL!"
     });
