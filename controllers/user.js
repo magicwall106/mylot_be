@@ -4,7 +4,7 @@ const nodemailer = require('nodemailer');
 const passport = require('passport');
 const User = require('../models/User');
 
-const queryField = 'email profile active google facebook realAwards tryAwards role';
+const queryUserField = 'email profile active google facebook realAwards tryAwards role';
 /**
  * GET /login
  * Login page.
@@ -210,7 +210,7 @@ exports.postApiSignup = (req, res, next) => {
       };
       transporter.sendMail(mailOptions, (err) => {
         done(err);
-        User.findById(user._id, queryField, (err, account) => {
+        User.findById(user._id, queryUserField, (err, account) => {
           return res.status(200).json(account);
         });
       });
@@ -272,7 +272,7 @@ exports.postUpdateProfile = (req, res, next) => {
  * API get profile information.
  */
 exports.getApiProfile = (req, res, next) => {
-  User.findById(req.user.id, queryField, (err, user) => {
+  User.findById(req.user.id, queryUserField, (err, user) => {
     if (err) { return res.status(400).json(err); }
     return res.status(200).json(user);
   });
@@ -715,7 +715,7 @@ exports.postApiForgot = (req, res, next) => {
 
 exports.getApiActive = (req, res, next) => {
   const activeKey = req.query.key;
-  User.findOne({ activeKey: activeKey }, queryField, (err, user) => {
+  User.findOne({ activeKey: activeKey }, queryUserField, (err, user) => {
     if (err) { return res.status(400).json(err) }
     if (!user) {
       return res.status(400).json({ msg: 'Activate key does not exist.' });

@@ -1,4 +1,8 @@
 const Result = require('../models/Result');
+const Lottery = require('../models/Lottery');
+const async = require('async');
+const queryResultField = 'code budget resultDate nums awards createdAt';
+
 /**
  * GET /result
  * Result Index Page.
@@ -179,11 +183,32 @@ exports.getApiResult = (req, res) => {
   const limit = Math.max(1, +req.query.limit || 0);
   const page = Math.max(0, +req.query.page - 1 || 0);
   const sort = { resultDate: 'desc' };
-  Result.paginate({}, { offset: limit * page, limit: limit, sort: sort }, function (err, result) {
-    if (err) {
-      res.status(400).json(err);
-    } else {
-      res.status(200).json(result);
-    }
-  });
+  const latest = req.query.latest || false;
+  if (!latest) {
+    Result.paginate({}, { offset: limit * page, limit: limit, sort: sort, select: queryResultField }, function (err, result) {
+      if (err) {
+        res.status(400).json(err);
+      } else {
+        res.status(200).json(result);
+      }
+    });
+  } else {
+    async.waterfall([
+      function (done) {
+        Result.findOne().select(queryResultField).sort({ "resultDate": -1 }).exec(function (err, result) {
+          done(err, result);
+        });
+      },
+      function (result, done) {
+        if (result) {
+          Lottery.count({ result: result._id }, function (err, c) {
+            return res.status(200).json({ docs: [result], currentLots: c });
+          });
+        }
+      }
+    ], (err) => {
+      if (err) { return res.status(400).json(err) }
+    });
+
+  }
 };
