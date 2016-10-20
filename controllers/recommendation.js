@@ -116,7 +116,7 @@ exports.postApiRecommendation = (req, res, next) => {
   } else {
     res.render('account/login', {
       title: 'Login',
-      message: "Login first! You don't have permission to access this URL!"
+      msg: "Login first! You don't have permission to access this URL!"
     });
   }
 };
@@ -191,7 +191,7 @@ exports.putApiRecommendation = (req, res, next) => {
   } else {
     res.render('account/login', {
       title: 'Login',
-      message: "Login first! You don't have permission to access this URL!"
+      msg: "Login first! You don't have permission to access this URL!"
     });
   }
 };
@@ -214,7 +214,7 @@ exports.deleteApiRecommendation = (req, res, next) => {
   } else {
     res.render('account/login', {
       title: 'Login',
-      message: "Login first! You don't have permission to access this URL!"
+      msg: "Login first! You don't have permission to access this URL!"
     });
   }
 };
