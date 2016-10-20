@@ -63,6 +63,12 @@ userSchema.pre('save', function (next) {
       next();
     });
   });
+  if(!user.profile.picture){
+    user.profile.picture = this.gravatar(60);
+  }
+  if(!user.profile.name){
+    user.profile.name = user.profile.firstname + user.profile.lastname;
+  }
 });
 
 /**
