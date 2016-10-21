@@ -5,7 +5,7 @@ block content
     h3 Add New Lottery
   form.form-horizontal(action='/api/lottery', id='add-recomendation-form', method='POST')
     input(type='hidden', name='_csrf', value=_csrf)
-    .form-group
+    //-.form-group
       label.col-sm-3.control-label(for='user') User
       .col-sm-7
         input.form-control(name='user', id='user', required)

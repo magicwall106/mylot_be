@@ -32,14 +32,14 @@ exports.getFacebook = (req, res, next) => {
       });
     }
   },
-  (err, results) => {
-    if (err) { return next(err); }
-    res.render('api/facebook', {
-      title: 'Facebook API',
-      me: results.getMyProfile,
-      friends: results.getMyFriends
+    (err, results) => {
+      if (err) { return next(err); }
+      res.render('api/facebook', {
+        title: 'Facebook API',
+        me: results.getMyProfile,
+        friends: results.getMyFriends
+      });
     });
-  });
 };
 
 /**
@@ -116,7 +116,7 @@ exports.getPayPalCancel = (req, res) => {
  * GET /api/upload
  * File Upload API example.
  */
- 
+
 exports.getFileUpload = (req, res, next) => {
   res.render('api/upload', {
     title: 'File Upload'

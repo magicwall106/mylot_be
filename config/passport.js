@@ -3,8 +3,10 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+const FacebookTokenStrategy = require('passport-facebook-token');
 
 const User = require('../models/User');
+const queryField = 'email profile active google facebook realAwards tryAwards role';
 
 passport.serializeUser((user, done) => {
   done(null, user.id);
@@ -17,6 +19,43 @@ passport.deserializeUser((id, done) => {
 });
 
 /**
+ * Sign in using Facebook token.
+ */
+passport.use(new FacebookTokenStrategy({
+  clientID: process.env.FACEBOOK_ID,
+  clientSecret: process.env.FACEBOOK_SECRET,
+}, function (accessToken, refreshToken, profile, done) {
+  User.findOne({ facebook: profile.id }, queryField, (err, existingUser) => {
+    if (existingUser) {
+      done(err, existingUser);
+    } else {
+      User.findOne({ email: profile._json.email }, (err, existingEmailUser) => {
+        if (existingEmailUser) {
+          done(err);
+        } else {
+          const user = new User();
+          user.email = profile._json.email;
+          user.facebook = profile.id;
+          user.phone = '';
+          user.role = process.env.ROLE_USER;
+          user.tokens.push({ kind: 'facebook', accessToken });
+          user.profile.name = user.profile.name || profile.name.givenName + ' ' + profile.name.familyName;
+          user.profile.firstname = profile.name.givenName;
+          user.profile.lastname = profile.name.familyName;
+          user.profile.gender = user.profile.gender || profile._json.gender;
+          user.profile.picture = user.profile.picture || `https://graph.facebook.com/${profile.id}/picture?type=large`;
+          user.profile.location = (profile._json.location) ? profile._json.location.name : '';
+          user.save((err) => {
+            done(err, user);
+          });
+
+        }
+      })
+    }
+  });
+}));
+
+/**
  * Sign in using Email and Password.
  */
 passport.use(new LocalStrategy({ usernameField: 'email' }, (email, password, done) => {
@@ -26,6 +65,7 @@ passport.use(new LocalStrategy({ usernameField: 'email' }, (email, password, don
     }
     user.comparePassword(password, (err, isMatch) => {
       if (isMatch) {
+        user.password = '';
         return done(null, user);
       }
       return done(null, false, { msg: 'Invalid email or password.' });
@@ -67,8 +107,11 @@ passport.use(new FacebookStrategy({
         User.findById(req.user.id, (err, user) => {
           user.facebook = profile.id;
           user.phone = '';
+          user.role = process.env.ROLE_USER;
           user.tokens.push({ kind: 'facebook', accessToken });
           user.profile.name = user.profile.name || profile.name.givenName + ' ' + profile.name.familyName;
+          user.profile.firstname = profile.name.givenName;
+          user.profile.lastname = profile.name.familyName;
           user.profile.gender = user.profile.gender || profile._json.gender;
           user.profile.picture = user.profile.picture || `https://graph.facebook.com/${profile.id}/picture?type=large`;
           user.save((err) => {
@@ -92,6 +135,7 @@ passport.use(new FacebookStrategy({
           user.email = profile._json.email;
           user.facebook = profile.id;
           user.phone = '';
+          user.role = process.env.ROLE_USER;
           user.tokens.push({ kind: 'facebook', accessToken });
           user.profile.name = profile.name.givenName + ' ' + profile.name.familyName;
           user.profile.gender = profile._json.gender;
@@ -124,6 +168,7 @@ passport.use(new GoogleStrategy({
         User.findById(req.user.id, (err, user) => {
           user.google = profile.id;
           user.phone = '';
+          user.role = process.env.ROLE_USER;
           user.tokens.push({ kind: 'google', accessToken });
           user.profile.name = user.profile.name || profile.displayName;
           user.profile.gender = user.profile.gender || profile._json.gender;
@@ -149,6 +194,7 @@ passport.use(new GoogleStrategy({
           user.email = profile.emails[0].value;
           user.google = profile.id;
           user.phone = '';
+          user.role = process.env.ROLE_USER;
           user.tokens.push({ kind: 'google', accessToken });
           user.profile.name = profile.displayName;
           user.profile.gender = profile._json.gender;
@@ -170,6 +216,16 @@ exports.isAuthenticated = (req, res, next) => {
     return next();
   }
   res.redirect('/login');
+};
+
+/**
+ * API Login Required middleware.
+ */
+exports.isApiAuthenticated = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  return res.status(400).json({ msg: 'Is not Authenticated' });
 };
 
 /**

@@ -1,21 +1,23 @@
 const Recommendation = require('../models/Recommendation');
 
+/****************************WEBPAGE SESSION********************************/
 /**
  * GET /recommendation
  * Recommendation Index Page.
  */
 exports.getRecommendation = (req, res) => {
-  Recommendation.find({'user': req.user.id},function(err,data){
-      if (err) {
-        res.render('error', {
-            status: 500
-        });
-      } else {
-        res.render('recommendation/index', {
-          title: 'Recommendation',
-          listRecommendation: data
-        });
-      }
+  var paramSearch = { 'user': req.user.id };
+  Recommendation.find(paramSearch, function (err, data) {
+    if (err) {
+      res.render('error', {
+        status: 400
+      });
+    } else {
+      res.render('recommendation/index', {
+        title: 'Recommendation',
+        listRecommendation: data
+      });
+    }
   });
 };
 
@@ -29,19 +31,21 @@ exports.getAddRecommendation = (req, res) => {
   });
 };
 
-
+/****************************API SESSION********************************/
 /**
  * GET /api/recommendation
  * Recommendation Json: Get all recommendations
  */
 exports.getApiRecommendation = (req, res) => {
-  Recommendation.find({},function(err,data){
-      if (err) {
-        res.render('error', {
-            status: 500
-        });
+  const limit = Math.max(10, req.query.limit || 0);
+  const page = Math.max(0, req.query.page || 0);
+  const paramSearch = { 'user': req.user.id };
+  const sort = {updatedAt: 'desc'};
+  Recommendation.paginate(paramSearch, { offset: limit * page, limit: limit, sort: sort }, function(err, result) {
+    if (err) {
+        res.status(400).json(err);
       } else {
-        res.jsonp(data);
+        res.status(200).json(result);
       }
   });
 };
@@ -52,7 +56,6 @@ exports.getApiRecommendation = (req, res) => {
  */
 
 exports.postApiRecommendation = (req, res, next) => {
-  //req.assert('user', 'User is required').notEmpty();
   req.assert('result', 'Result is required').notEmpty();
   req.assert('condition', 'Condition is required').notEmpty();
   req.assert('num1', 'Number 1 is invalid').notEmpty().isInt();
@@ -73,10 +76,11 @@ exports.postApiRecommendation = (req, res, next) => {
     return res.redirect('/recommendation/add');
   }
 
-  if(req.user){
+  if (req.user) {
     const recommendation = new Recommendation({
       user: req.user.id,
       result: req.body.result,
+      status: '',
       condition: req.body.condition,
       nums: {
         num1: {
@@ -112,7 +116,7 @@ exports.postApiRecommendation = (req, res, next) => {
   } else {
     res.render('account/login', {
       title: 'Login',
-      message: "Login first! You don't have permission to access this URL!"
+      msg: "Login first! You don't have permission to access this URL!"
     });
   }
 };
@@ -123,6 +127,7 @@ exports.postApiRecommendation = (req, res, next) => {
  */
 exports.putApiRecommendation = (req, res, next) => {
   req.assert('condition', 'Condition is required').notEmpty();
+  req.assert('status', 'Status is required').notEmpty();
   req.assert('num1', 'Number 1 is invalid').notEmpty().isInt();
   req.assert('rate1', 'Rating of Number 1 is invalid').isInt();
   req.assert('num2', 'Number 2 is invalid').notEmpty().isInt();
@@ -139,51 +144,54 @@ exports.putApiRecommendation = (req, res, next) => {
   const errors = req.validationErrors();
   if (errors) {
     req.flash('errors', errors);
-    return res.send(JSON.stringify(errors));
+    return res.status(400).json(errors);
   }
   const id = req.body.id;
-  if(req.user && id){
-    Recommendation.update({_id: id}, {$set: {
-      condition: req.body.condition,
-      result: req.body.result,
-      nums: {
-        num1: {
-          value: req.body.num1,
-          rate: req.body.rate1
-        },
-        num2: {
-          value: req.body.num2,
-          rate: req.body.rate2
-        },
-        num3: {
-          value: req.body.num3,
-          rate: req.body.rate3
-        },
-        num4: {
-          value: req.body.num4,
-          rate: req.body.rate4
-        },
-        num5: {
-          value: req.body.num5,
-          rate: req.body.rate5
-        },
-        num6: {
-          value: req.body.num6,
-          rate: req.body.rate6
+  if (req.user && id) {
+    Recommendation.update({ _id: id }, {
+      $set: {
+        condition: req.body.condition,
+        status: req.body.status,
+        result: req.body.result,
+        nums: {
+          num1: {
+            value: req.body.num1,
+            rate: req.body.rate1
+          },
+          num2: {
+            value: req.body.num2,
+            rate: req.body.rate2
+          },
+          num3: {
+            value: req.body.num3,
+            rate: req.body.rate3
+          },
+          num4: {
+            value: req.body.num4,
+            rate: req.body.rate4
+          },
+          num5: {
+            value: req.body.num5,
+            rate: req.body.rate5
+          },
+          num6: {
+            value: req.body.num6,
+            rate: req.body.rate6
+          }
         }
       }
-    }}, function(err) {
-        if (!err) {
-          res.send('notification!');
-        }
-        else {
-          res.send(err);
-        }
+    }, function (err) {
+      if (!err) {
+        res.status(200).send('notification!');
+      }
+      else {
+        res.status(400).json(err);
+      }
     });
   } else {
     res.render('account/login', {
       title: 'Login',
-      message: "Login first! You don't have permission to access this URL!"
+      msg: "Login first! You don't have permission to access this URL!"
     });
   }
 };
@@ -194,20 +202,19 @@ exports.putApiRecommendation = (req, res, next) => {
  */
 exports.deleteApiRecommendation = (req, res, next) => {
   const id = req.params.id;
-  if(req.user && id){
-    Recommendation.remove({ _id: id }, function(err) {
+  if (req.user && id) {
+    Recommendation.remove({ _id: id }, function (err) {
       if (!err) {
-        res.send('notification!');
+        res.status(200).send('notification!');
       }
       else {
-        res.send(err);
+        res.status(400).json(err);
       }
     });
-    //res.send("asdasdas");
   } else {
     res.render('account/login', {
       title: 'Login',
-      message: "Login first! You don't have permission to access this URL!"
+      msg: "Login first! You don't have permission to access this URL!"
     });
   }
 };

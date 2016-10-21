@@ -2,13 +2,16 @@
 const bcrypt = require('bcrypt-nodejs');
 const crypto = require('crypto');
 const mongoose = require('mongoose');
+const MongooseRole = require('mongoose-role');
 
 const userSchema = new mongoose.Schema({
   email: { type: String, unique: true },
-  phone: { type: String, unique: true },
+  phone: String,
   password: String,
   passwordResetToken: String,
   passwordResetExpires: Date,
+  active: Boolean,
+  activeKey: String,
 
   facebook: String,
   twitter: String,
@@ -18,16 +21,33 @@ const userSchema = new mongoose.Schema({
   linkedin: String,
   steam: String,
   tokens: Array,
-  realAwards: [{type: mongoose.Schema.Types.ObjectId, ref:"Lottery"}],
-  tryAwards: [{type: mongoose.Schema.Types.ObjectId, ref:"Recommendation"}],
+  realAwards: [{ type: mongoose.Schema.Types.ObjectId, ref: "Lottery" }],
+  tryAwards: [{ type: mongoose.Schema.Types.ObjectId, ref: "Recommendation" }],
   profile: {
-    name: String,
+    name: {type: String, default: ''},
+    firstname: {type: String, default: ''},
+    lastname: {type: String, default: ''},
     gender: String,
+    dob: Date,
+    address: {type: String, default: ''},
+    city: String,
     location: String,
     website: String,
     picture: String
   }
 }, { timestamps: true });
+
+//add role to user
+userSchema.plugin(MongooseRole, {
+  roles: ['public', 'user', 'admin', 'superuser'],
+  accessLevels: {
+    'public': ['public', 'user', 'admin', 'superuser'],
+    'anon': ['public'],
+    'user': ['user', 'admin', 'superuser'],
+    'admin': ['admin', 'superuser'],
+    'superuser': ['superuser']
+  }
+});
 
 /**
  * Password hash middleware.
@@ -43,6 +63,12 @@ userSchema.pre('save', function (next) {
       next();
     });
   });
+  if(!user.profile.picture){
+    user.profile.picture = this.gravatar(60);
+  }
+  if(!user.profile.name){
+    user.profile.name = user.profile.firstname + user.profile.lastname;
+  }
 });
 
 /**
@@ -58,7 +84,7 @@ userSchema.methods.comparePassword = function (candidatePassword, cb) {
  * Helper method for getting user's gravatar.
  */
 userSchema.methods.gravatar = function (size) {
-   size = 200;
+  size = 200;
   console.log('size', size);
   if (!this.email) {
     return `https://gravatar.com/avatar/?s=${size}&d=retro`;

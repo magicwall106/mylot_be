@@ -49,3 +49,33 @@ exports.postContact = (req, res) => {
     res.redirect('/contact');
   });
 };
+
+/**
+ * POST /api/contact
+ * API Send a contact form via Nodemailer.
+ */
+exports.postApiContact = (req, res) => {
+  req.assert('name', 'Name cannot be blank').notEmpty();
+  req.assert('email', 'Email is not valid').isEmail();
+  req.assert('message', 'Message cannot be blank').notEmpty();
+
+  const errors = req.validationErrors();
+
+  if (errors) {
+    return res.status(401).json(errors);
+  }
+
+    const mailOptions = {
+    to: process.env.GMAIL_USERID,
+    from: `${req.body.name} <${req.body.email}>`,
+    subject: 'Contact Form | Mylot Contact',
+    text: req.body.message
+  };
+
+  transporter.sendMail(mailOptions, (err) => {
+    if (err) {
+      return res.status(400).json({ msg: err.message });
+    }
+    res.status(200).json({ msg: 'Email has been sent successfully!' });
+  });
+};

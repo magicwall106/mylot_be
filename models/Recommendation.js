@@ -1,53 +1,56 @@
 const mongoose = require('mongoose');
+const mongoosePaginate = require('mongoose-paginate');
 
 const recommendationSchema = new mongoose.Schema({
   result: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Result'
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Result'
   },
   user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User'
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
   },
-	condition: Array,
+  condition: Array,
+  status: String,
   award: {
-      type: Number,
-      enum : [0,1,2,3,4],
-      default : 0
+    type: Number,
+    enum: [0, 1, 2, 3, 4],
+    default: 0
   },
   nums: {
-    num1:{
+    num1: {
       value: Number,
-      rate: {type: Number, default: 0},
+      rate: { type: Number, default: 0 },
       status: Boolean
     },
-    num2:{
+    num2: {
       value: Number,
-      rate: {type: Number, default: 0},
+      rate: { type: Number, default: 0 },
       status: Boolean
     },
-    num3:{
+    num3: {
       value: Number,
-      rate: {type: Number, default: 0},
+      rate: { type: Number, default: 0 },
       status: Boolean
     },
-    num4:{
+    num4: {
       value: Number,
-      rate: {type: Number, default: 0},
+      rate: { type: Number, default: 0 },
       status: Boolean
     },
-    num5:{
+    num5: {
       value: Number,
-      rate: {type: Number, default: 0},
+      rate: { type: Number, default: 0 },
       status: Boolean
     },
-    num6:{
+    num6: {
       value: Number,
-      rate: {type: Number, default: 0},
+      rate: { type: Number, default: 0 },
       status: Number
     }
   }
 }, { timestamps: true });
+recommendationSchema.plugin(mongoosePaginate);
 
 recommendationSchema.pre('save', function (next) {
   console.log('INFO-RECOMMENDATION: Saving recommendation date: ');
