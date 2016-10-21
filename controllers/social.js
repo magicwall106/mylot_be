@@ -36,7 +36,7 @@ exports.postApiAuthFacebook = (req, res, next) => {
 
         newuser.save((err) => {
           if (err) { done(err) }
-          return res.status(200).json({ existing: faslse, user: newuser });
+          return res.status(200).json({ existing: false, user: newuser });
         });
       });
     }

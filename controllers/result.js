@@ -1,4 +1,8 @@
 const Result = require('../models/Result');
+const Lottery = require('../models/Lottery');
+const async = require('async');
+const queryResultField = 'code budget resultDate nums awards createdAt';
+
 /**
  * GET /result
  * Result Index Page.
@@ -7,7 +11,7 @@ exports.getResult = (req, res) => {
   Result.find().exec(function (err, data) {
     if (err) {
       res.render('error', {
-        status: 500
+        status: 400
       });
     } else {
       res.render('result/index', {
@@ -37,20 +41,14 @@ exports.postApiResult = (req, res, next) => {
   req.assert('code', 'Code is required').notEmpty();
   req.assert('budget', 'Budget is invalid').notEmpty().isInt();
   req.assert('resultDate', 'Result Date is invalid').notEmpty().isDate();
-  req.assert('num1', 'Number 1 is invalid').notEmpty().isInt();
-  req.assert('num2', 'Number 2 is invalid').notEmpty().isInt();
-  req.assert('num3', 'Number 3 is invalid').notEmpty().isInt();
-  req.assert('num4', 'Number 4 is invalid').notEmpty().isInt();
-  req.assert('num5', 'Number 5 is invalid').notEmpty().isInt();
-  req.assert('num6', 'Number 6 is invalid').notEmpty().isInt();
+  req.assert('nums', 'Ticket is invalid').isArray().isTicket();
   req.assert('award1', 'Award 1 is invalid').isInt();
   req.assert('award2', 'Award 2 is invalid').isInt();
   req.assert('award3', 'Award 3 is invalid').isInt();
   req.assert('award4', 'Award 4 is invalid').isInt();
   const errors = req.validationErrors();
   if (errors) {
-    req.flash('errors', errors);
-    return res.redirect('/result/add');
+    return res.status(401).json(errors);
   }
 
   if (req.user) {
@@ -58,14 +56,7 @@ exports.postApiResult = (req, res, next) => {
       code: req.body.code,
       budget: req.body.budget,
       resultDate: req.body.resultDate,
-      nums: {
-        num1: req.body.num1,
-        num2: req.body.num2,
-        num3: req.body.num3,
-        num4: req.body.num4,
-        num5: req.body.num5,
-        num6: req.body.num6,
-      },
+      nums: req.body.nums.sort(compare),
       awards: {
         award1: req.body.award1,
         award2: req.body.award2,
@@ -73,16 +64,15 @@ exports.postApiResult = (req, res, next) => {
         award4: req.body.award4
       }
     });
-    //res.jsonp(result);
     result.save((err) => {
-      if (err) { return next(err); }
-      res.redirect('/');
+      if (err) { return res.status(400).json(err); }
+      return res.status(200).json('saved');
     });
 
   } else {
-    res.render('account/login', {
+    res.status(400).json({
       title: 'Login',
-      message: "Login first! You don't have permission to access this URL!"
+      msg: "Login first! You don't have permission to access this URL!"
     });
   }
 };
@@ -95,12 +85,7 @@ exports.putApiResult = (req, res, next) => {
   req.assert('id', 'Did not found ID result').notEmpty();
   req.assert('budget', 'Budget is invalid').isInt();
   req.assert('resultDate', 'Result Date is invalid').isDate();
-  req.assert('num1', 'Number 1 is invalid').isInt();
-  req.assert('num2', 'Number 2 is invalid').isInt();
-  req.assert('num3', 'Number 3 is invalid').isInt();
-  req.assert('num4', 'Number 4 is invalid').isInt();
-  req.assert('num5', 'Number 5 is invalid').isInt();
-  req.assert('num6', 'Number 6 is invalid').isInt();
+  req.assert('nums', 'Ticket is invalid').isArray().isTicket();
   req.assert('award1', 'Award 1 is invalid').isInt();
   req.assert('award2', 'Award 2 is invalid').isInt();
   req.assert('award3', 'Award 3 is invalid').isInt();
@@ -108,8 +93,7 @@ exports.putApiResult = (req, res, next) => {
 
   const errors = req.validationErrors();
   if (errors) {
-    req.flash('errors', errors);
-    return res.status(500).json(errors);
+    return res.status(401).json(errors);
   }
   const id = req.body.id;
   if (req.user && id) {
@@ -117,14 +101,7 @@ exports.putApiResult = (req, res, next) => {
       $set: {
         resultDate: req.body.resultDate,
         budget: req.body.budget,
-        nums: {
-          num1: req.body.num1,
-          num2: req.body.num2,
-          num3: req.body.num3,
-          num4: req.body.num4,
-          num5: req.body.num5,
-          num6: req.body.num6,
-        },
+        nums: req.body.nums.sort(compare),
         awards: {
           award1: req.body.award1,
           award2: req.body.award2,
@@ -133,17 +110,13 @@ exports.putApiResult = (req, res, next) => {
         }
       }
     }, function (err) {
-      if (!err) {
-        res.status(200).send('notification!');
-      }
-      else {
-        res.status(500).json(err);
-      }
+      if (!err) { return res.status(400).json(err); }
+      res.status(200).send('notification!');
     });
   } else {
-    res.render('account/login', {
+    res.status(400).json({
       title: 'Login',
-      message: "Login first! You don't have permission to access this URL!"
+      msg: "Login first! You don't have permission to access this URL!"
     });
   }
 };
@@ -156,17 +129,13 @@ exports.deleteApiResult = (req, res, next) => {
   const id = req.params.id;
   if (req.user && id) {
     Result.remove({ _id: id }, function (err) {
-      if (!err) {
-        res.status(200).send('notification!');
-      }
-      else {
-        res.status(500).json(err);
-      }
+      if (err) { return res.status(400).json(err); }
+      return res.status(200).send('deleted!');
     });
   } else {
-    res.render('account/login', {
+    res.status(400).json({
       title: 'Login',
-      message: "Login first! You don't have permission to access this URL!"
+      msg: "Login first! You don't have permission to access this URL!"
     });
   }
 };
@@ -176,14 +145,40 @@ exports.deleteApiResult = (req, res, next) => {
  * Result Json: Get all results
  */
 exports.getApiResult = (req, res) => {
-  const limit = Math.max(10, req.query.limit || 0);
-  const page = Math.max(0, req.query.page || 0);
-  const sort = {resultDate: 'desc'};
-  Result.paginate({}, { offset: limit * page, limit: limit, sort: sort }, function(err, result) {
-    if (err) {
-        res.status(500).json(err);
-      } else {
-        res.status(200).json(result);
+  const limit = Math.max(1, +req.query.limit || 0);
+  const page = Math.max(0, +req.query.page - 1 || 0);
+  const sort = { resultDate: 'desc' };
+  const latest = req.query.latest || false;
+  if (!latest) {
+    Result.paginate({}, { offset: limit * page, limit: limit, sort: sort, select: queryResultField }, function (err, result) {
+      if (err) { return res.status(400).json(err); }
+      return res.status(200).json(result);
+    });
+  } else {
+    async.waterfall([
+      function (done) {
+        Result.findOne().select(queryResultField).sort({ "resultDate": -1 }).exec(function (err, result) {
+          done(err, result);
+        });
+      },
+      function (result, done) {
+        if (result) {
+          Lottery.count({ result: result._id }, function (err, c) {
+            return res.status(200).json({ docs: [result], currentLots: c });
+          });
+        }
       }
-  });
+    ], (err) => {
+      if (err) { return res.status(400).json(err) }
+    });
+
+  }
 };
+
+function compare(a, b) {
+  if (a.rate < b.rate)
+    return 1;
+  if (a.rate > b.rate)
+    return -1;
+  return 0;
+}

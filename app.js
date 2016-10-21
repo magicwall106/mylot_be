@@ -15,7 +15,6 @@ const flash = require('express-flash');
 const path = require('path');
 const mongoose = require('mongoose');
 const passport = require('passport');
-const expressValidator = require('express-validator');
 const sass = require('node-sass-middleware');
 const multer = require('multer');
 const upload = multer({ dest: path.join(__dirname, 'uploads') });
@@ -33,9 +32,11 @@ const userController = require('./controllers/user');
 const apiController = require('./controllers/api');
 const contactController = require('./controllers/contact');
 const resultController = require('./controllers/result');
+const rateController = require('./controllers/rate');
 const recommendationController = require('./controllers/recommendation');
 const lotteryController = require('./controllers/lottery');
 const socialController = require('./controllers/social');
+const customValidators = require('./controllers/customValidator');
 /**
  * API keys and Passport configuration.
  */
@@ -73,7 +74,7 @@ app.use(sass({
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(expressValidator());
+app.use(customValidators.customValidators);
 
 var sessionOption = {
   name: 'mylot.sid',
@@ -197,6 +198,14 @@ app.get('/api/lottery', passportConfig.isApiAuthenticated, lotteryController.get
 app.put('/api/lottery', passportConfig.isApiAuthenticated, lotteryController.putApiLottery);
 app.post('/api/lottery', passportConfig.isApiAuthenticated, lotteryController.postApiLottery);
 app.delete('/api/lottery/:id', passportConfig.isApiAuthenticated, lotteryController.deleteApiLottery);
+
+/**
+ * API rate.
+ */
+app.get('/api/rate', rateController.getApiRate);
+app.put('/api/rate', passportConfig.isApiAuthenticated, rateController.putApiRate);
+app.post('/api/rate', passportConfig.isApiAuthenticated, rateController.postApiRate);
+app.delete('/api/rate/:id', passportConfig.isApiAuthenticated, rateController.deleteApiRate);
 /**
  * API examples routes.
  */
