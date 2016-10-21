@@ -135,7 +135,7 @@ app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }))
 /**
  * Primary app routes.
  */
-app.get('/', homeController.index);
+/*app.get('/', homeController.index);
 app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
 app.get('/logout', userController.logout);
@@ -158,7 +158,7 @@ app.get('/result/add', passportConfig.isAuthenticated, resultController.getAddRe
 app.get('/recommendation', passportConfig.isAuthenticated, recommendationController.getRecommendation);
 app.get('/recommendation/add', passportConfig.isAuthenticated, recommendationController.getAddRecommendation);
 app.get('/lottery', passportConfig.isAuthenticated, lotteryController.getLottery);
-app.get('/lottery/add', passportConfig.isAuthenticated, lotteryController.getAddLottery);
+app.get('/lottery/add', passportConfig.isAuthenticated, lotteryController.getAddLottery);*/
 
 /*USER API****************/
 app.post('/api/login', userController.postApiLogin);
