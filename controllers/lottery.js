@@ -51,7 +51,39 @@ exports.getApiLottery = (req, res) => {
  * Add single||multiple lottery.
  */
 exports.postApiLottery = (req, res, next) => {
-  req.assert('result', 'Result is required').notEmpty();
+  req.assert('form', 'Form is invalid').isArray();
+  //req.assert('form[0].nums', 'Condition is required').notEmpty();
+  //req.assert('nums', 'Your ticket is invalid').isArray().isTicket();
+  const errors = req.validationErrors();
+  if (errors) {
+    return res.status(401).json(errors);
+  }
+
+  if (req.user) {
+    for (var i = 0; i < req.body.form.length; i++) {
+      form[i].user = req.user._id;
+      form[i].nums = form[i].nums.sort(compare);
+      form[i]['status'] = '';
+      var lottery = new Lottery(form[i]);
+      lottery.save((err) => {
+        if (err) { return res.status(400).json(err); }
+      });
+    }
+    return res.status(200).send('saved');
+  } else {
+    res.status(400).json({
+      title: 'Login',
+      msg: "Login first! You don't have permission to access this URL!"
+    });
+  }
+}
+
+/**
+ * POST /lottery
+ * Add single||multiple lottery.
+ */
+/*exports.postApiLottery = (req, res, next) => {
+  req.assert('form', 'Form is invalid').isArray();
   req.assert('condition', 'Condition is required').notEmpty();
   req.assert('nums', 'Your ticket is invalid').isArray().isTicket();
   const errors = req.validationErrors();
@@ -77,7 +109,7 @@ exports.postApiLottery = (req, res, next) => {
       msg: "Login first! You don't have permission to access this URL!"
     });
   }
-};
+};*/
 
 /**
  * PUT api/lottery
