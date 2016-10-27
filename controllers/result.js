@@ -56,7 +56,7 @@ exports.postApiResult = (req, res, next) => {
       code: req.body.code,
       budget: req.body.budget,
       resultDate: req.body.resultDate,
-      nums: req.body.nums.sort(compare),
+      nums: req.body.nums,
       awards: {
         award1: req.body.award1,
         award2: req.body.award2,
@@ -101,7 +101,7 @@ exports.putApiResult = (req, res, next) => {
       $set: {
         resultDate: req.body.resultDate,
         budget: req.body.budget,
-        nums: req.body.nums.sort(compare),
+        nums: req.body.nums,
         awards: {
           award1: req.body.award1,
           award2: req.body.award2,
@@ -174,11 +174,3 @@ exports.getApiResult = (req, res) => {
 
   }
 };
-
-function compare(a, b) {
-  if (a.rate < b.rate)
-    return 1;
-  if (a.rate > b.rate)
-    return -1;
-  return 0;
-}

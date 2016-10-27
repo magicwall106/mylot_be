@@ -6,7 +6,7 @@ const resultSchema = new mongoose.Schema({
   budget: Number,
   resultDate: Date,
   nums: [{
-    value: { type: Number, required: true },
+    value: { type: Number, required: true, max:45, min:1 },
     rate: { type: Number, default: 0 },
     status: Boolean
   }],
@@ -18,10 +18,17 @@ const resultSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 resultSchema.plugin(mongoosePaginate);
-/**
- * Password hash middleware.
- */
+
+function compare(a, b) {
+  if (a.rate < b.rate)
+    return 1;
+  if (a.rate > b.rate)
+    return -1;
+  return 0;
+}
+
 resultSchema.pre('save', function (next) {
+  this.nums.sort(compare);
   console.log('INFO-RESULT: Saving result date: ' + this.resultDate + ' | value: ' + this.nums);
   next();
 });

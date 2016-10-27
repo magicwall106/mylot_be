@@ -8,9 +8,18 @@ const rateSchema = new mongoose.Schema({
 rateSchema.plugin(mongoosePaginate);
 
 rateSchema.pre('save', function (next) {
+  this.rates.sort(compare);
   console.log('INFO-RATE: Saving rates numbers: ' + this.rates.length);
   next();
 });
+
+function compare(a, b) {
+  if (a.rate < b.rate)
+    return 1;
+  if (a.rate > b.rate)
+    return -1;
+  return 0;
+}
 
 const Rate = mongoose.model('Rate', rateSchema);
 

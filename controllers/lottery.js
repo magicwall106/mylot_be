@@ -1,5 +1,5 @@
 const Lottery = require('../models/Lottery');
-
+const async = require('async');
 const queryRateField = '_id result condition status award nums';
 /****************************WEBPAGE SESSION********************************/
 /**
@@ -51,25 +51,52 @@ exports.getApiLottery = (req, res) => {
  * Add single||multiple lottery.
  */
 exports.postApiLottery = (req, res, next) => {
-  req.assert('form', 'Form is invalid').isArray();
-  //req.assert('form[0].nums', 'Condition is required').notEmpty();
-  //req.assert('nums', 'Your ticket is invalid').isArray().isTicket();
+  req.assert('form', 'Form is invalid').isArray().isListTicket();
   const errors = req.validationErrors();
   if (errors) {
     return res.status(401).json(errors);
   }
 
   if (req.user) {
-    for (var i = 0; i < req.body.form.length; i++) {
-      form[i].user = req.user._id;
-      form[i].nums = form[i].nums.sort(compare);
-      form[i]['status'] = '';
-      var lottery = new Lottery(form[i]);
-      lottery.save((err) => {
-        if (err) { return res.status(400).json(err); }
-      });
-    }
-    return res.status(200).send('saved');
+    var form = req.body.form;
+    async.waterfall([
+      function (done) {
+        var lotteries = [];
+        var err = [];
+        for (var i = 0; i < form.length; i++) {
+          if (form[i]) {
+            form[i].user = req.user.id;
+            form[i].nums = numsToArray(form[i].nums);
+            form[i].status = '';
+            lotteries.push(new Lottery(form[i]));
+          } else {
+            err.push({ itemNum: i, msg: 'Ticket index(' + i + ') id null' })
+            continue;
+          }
+        }
+        done(err.length == 0 ? null : err, lotteries);
+      },
+      function (lotteries, done) {
+        if (lotteries) {
+          var functions = [];
+          for (var i = 0; i < lotteries.length; i++) {
+            functions.push((function (doc) {
+              return function (callback) {
+                doc.save(callback);
+              };
+            })(lotteries[i]));
+          }
+          done(null, functions);
+        }
+      },
+      function (functions, done) {
+        async.parallel(functions, function (errors, results) {
+          return res.status(200).json(results);
+        });
+      }
+    ], (err) => {
+      if (err) { return res.status(400).json(err) }
+    });
   } else {
     res.status(400).json({
       title: 'Login',
@@ -131,7 +158,7 @@ exports.putApiLottery = (req, res, next) => {
         condition: req.body.condition,
         status: req.body.status,
         result: req.body.result,
-        nums: req.body.nums.sort(compare)
+        nums: req.body.nums
       }
     }, function (err) {
       if (err) { return res.status(400).json(err); }
@@ -165,10 +192,7 @@ exports.deleteApiLottery = (req, res, next) => {
   }
 };
 
-function compare(a, b) {
-  if (a.rate < b.rate)
-    return 1;
-  if (a.rate > b.rate)
-    return -1;
-  return 0;
+function numsToArray(nums) {
+  return Object.keys(nums).map(function (key) { return nums[key]; });
+
 }

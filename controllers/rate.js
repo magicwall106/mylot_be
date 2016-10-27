@@ -30,7 +30,7 @@ exports.postApiRate = (req, res, next) => {
   if (req.user) {
     const rate = new Rate({
       result: req.body.result,
-      rates: req.body.rates.sort(compare)
+      rates: req.body.rates
     });
 
     rate.save((err) => {
@@ -61,7 +61,7 @@ exports.putApiRate = (req, res, next) => {
     Rate.update({ _id: id }, {
       $set: {
         result: req.body.result,
-        rates: req.body.rates.sort(compare)
+        rates: req.body.rates
       }
     }, function (err) {
       if (err) { return res.status(400).json(err); }
@@ -93,11 +93,3 @@ exports.deleteApiRate = (req, res, next) => {
     });
   }
 };
-
-function compare(a, b) {
-  if (a.rate < b.rate)
-    return 1;
-  if (a.rate > b.rate)
-    return -1;
-  return 0;
-}
