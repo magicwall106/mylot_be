@@ -38,8 +38,9 @@ exports.getAddLottery = (req, res) => {
 exports.getApiLottery = (req, res) => {
   const limit = Math.max(10, req.query.limit || 0);
   const page = Math.max(0, req.query.page || 0);
-  var paramSearch = { 'user': req.user.id };
   const sort = { updatedAt: 'desc' };
+  const paramSearch = req.user.role === 'admin' ? {} : { 'user': req.user.id }; //Case admin: can see all lottery
+  if(req.query.result)
   Lottery.paginate(paramSearch, { offset: limit * page, limit: limit, sort: sort, select: queryRateField }, function (err, result) {
     if (err) { res.status(400).json(err); }
     res.status(200).json(result);
