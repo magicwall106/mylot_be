@@ -117,7 +117,7 @@ app.use(function (req, res, next) {
 });
 
 app.use(function (req, res, next) {
-  var allowedOrigins = ['http://localhost:3000', 'http://localhost:8080', 'http://mylot-expressapp.rhcloud.com','http://129.vn/mylot.html'];
+  var allowedOrigins = ['http://localhost:3000', 'http://localhost:8080', 'http://mylot-expressapp.rhcloud.com','http://129.vn/mylot.html','http://mylotfe-expressapp.rhcloud.com',];
   var origin = req.headers.origin;
   if(allowedOrigins.indexOf(origin) > -1){
        res.setHeader('Access-Control-Allow-Origin', origin);
